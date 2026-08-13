@@ -32,47 +32,41 @@ static void prv_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   prv_update_time(tick_time);
 }
 
+static bool prv_is_word_letter(ClockWord requested_word, uint8_t row,
+                               uint8_t column) {
+  ClockGridWord word;
+  return clock_language_get_word(s_clock_language, requested_word, &word) &&
+         row == word.row && column >= word.column &&
+         column < word.column + word.length;
+}
+
 static bool prv_is_number_letter(uint8_t row, uint8_t column) {
-  for (uint8_t number = 1; number <= 12; ++number) {
-    ClockGridWord word;
-    if (clock_language_get_number(s_clock_language, number, &word) &&
-        row == word.row && column >= word.column &&
-        column < word.column + word.length) {
-      return true;
-    }
+  if (s_minutes_rounded_to_five != 0) {
+    return false;
   }
 
-  return false;
+  const uint8_t hour = s_hours % 12;
+  const uint8_t display_hour = hour == 0 ? 12 : hour;
+  ClockGridWord word;
+  return clock_language_get_number(s_clock_language, display_hour, &word) &&
+         row == word.row && column >= word.column &&
+         column < word.column + word.length;
 }
 
 static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
-  static const uint8_t s_minute_quantities[] = { 5, 10, 20, 25 };
-
-  for (uint8_t index = 0; index < ARRAY_LENGTH(s_minute_quantities); ++index) {
-    ClockGridWord word;
-    if (clock_language_get_minute_quantity(s_clock_language,
-                                           s_minute_quantities[index], &word) &&
-        row == word.row && column >= word.column &&
-        column < word.column + word.length) {
-      return true;
-    }
-  }
-
+  (void)row;
+  (void)column;
   return false;
 }
 
 static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
-  for (ClockWord requested_word = CLOCK_WORD_IT;
-       requested_word < CLOCK_WORD_COUNT; ++requested_word) {
-    ClockGridWord word;
-    if (clock_language_get_word(s_clock_language, requested_word, &word) &&
-        row == word.row && column >= word.column &&
-        column < word.column + word.length) {
-      return true;
-    }
+  if (prv_is_word_letter(CLOCK_WORD_IT, row, column) ||
+      prv_is_word_letter(CLOCK_WORD_IS, row, column)) {
+    return true;
   }
 
-  return false;
+  return s_minutes_rounded_to_five == 0 &&
+         prv_is_word_letter(CLOCK_WORD_OCLOCK, row, column);
 }
 
 static void prv_draw_minute_dots(GContext *ctx, GRect bounds,
