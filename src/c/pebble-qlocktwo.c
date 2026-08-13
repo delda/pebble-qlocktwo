@@ -9,6 +9,28 @@ static Window *s_window;
 static Layer *s_grid_layer;
 static const ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const char *const *s_letter_grid;
+static uint8_t s_hours;
+static uint8_t s_minutes;
+static uint8_t s_seconds;
+static uint8_t s_minutes_rounded_to_five;
+static uint8_t s_minutes_modulo_five;
+
+static void prv_update_time(struct tm *tick_time) {
+  s_hours = tick_time->tm_hour;
+  s_minutes = tick_time->tm_min;
+  s_seconds = tick_time->tm_sec;
+  s_minutes_rounded_to_five = (s_minutes / 5) * 5;
+  s_minutes_modulo_five = s_minutes % 5;
+
+  if (s_grid_layer) {
+    layer_mark_dirty(s_grid_layer);
+  }
+}
+
+static void prv_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  (void)units_changed;
+  prv_update_time(tick_time);
+}
 
 static bool prv_is_number_letter(uint8_t row, uint8_t column) {
   for (uint8_t number = 1; number <= 12; ++number) {
@@ -60,7 +82,7 @@ static void prv_draw_minute_dots(GContext *ctx, GRect bounds,
   const int16_t dot_y = bounds.size.h - 3;
 
   graphics_context_set_fill_color(ctx, GColorWhite);
-  for (uint8_t index = 0; index < ARRAY_LENGTH(s_dot_boundaries); ++index) {
+  for (uint8_t index = 0; index < s_minutes_modulo_five; ++index) {
     graphics_fill_circle(ctx,
                          GPoint(s_dot_boundaries[index] * cell_width, dot_y), 2);
   }
@@ -122,9 +144,14 @@ static void prv_init(void) {
     .unload = prv_window_unload,
   });
   window_stack_push(s_window, true);
+
+  time_t now = time(NULL);
+  prv_update_time(localtime(&now));
+  tick_timer_service_subscribe(SECOND_UNIT, prv_tick_handler);
 }
 
 static void prv_deinit(void) {
+  tick_timer_service_unsubscribe();
   window_destroy(s_window);
 }
 
