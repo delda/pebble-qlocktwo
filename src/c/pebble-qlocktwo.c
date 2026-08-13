@@ -10,6 +10,62 @@ static Layer *s_grid_layer;
 static const ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const char *const *s_letter_grid;
 
+static bool prv_is_number_letter(uint8_t row, uint8_t column) {
+  for (uint8_t number = 1; number <= 12; ++number) {
+    ClockGridWord word;
+    if (clock_language_get_number(s_clock_language, number, &word) &&
+        row == word.row && column >= word.column &&
+        column < word.column + word.length) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
+  static const uint8_t s_minute_quantities[] = { 5, 10, 20, 25 };
+
+  for (uint8_t index = 0; index < ARRAY_LENGTH(s_minute_quantities); ++index) {
+    ClockGridWord word;
+    if (clock_language_get_minute_quantity(s_clock_language,
+                                           s_minute_quantities[index], &word) &&
+        row == word.row && column >= word.column &&
+        column < word.column + word.length) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
+  for (ClockWord requested_word = CLOCK_WORD_IT;
+       requested_word < CLOCK_WORD_COUNT; ++requested_word) {
+    ClockGridWord word;
+    if (clock_language_get_word(s_clock_language, requested_word, &word) &&
+        row == word.row && column >= word.column &&
+        column < word.column + word.length) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static void prv_draw_minute_dots(GContext *ctx, GRect bounds,
+                                 int16_t cell_width) {
+  // The dots sit between S/E, E/O, O/C, and C/L in "TENSEOCLOCK".
+  static const uint8_t s_dot_boundaries[] = { 4, 5, 6, 7 };
+  const int16_t dot_y = bounds.size.h - 3;
+
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  for (uint8_t index = 0; index < ARRAY_LENGTH(s_dot_boundaries); ++index) {
+    graphics_fill_circle(ctx,
+                         GPoint(s_dot_boundaries[index] * cell_width, dot_y), 2);
+  }
+}
+
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   const int16_t cell_width = bounds.size.w / GRID_COLUMNS;
@@ -17,7 +73,6 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   const GFont font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
 
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_context_set_text_color(ctx, GColorWhite);
 
   for (int row = 0; row < GRID_ROWS; ++row) {
     for (int column = 0; column < GRID_COLUMNS; ++column) {
@@ -31,11 +86,19 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       const char letter[] = { s_letter_grid[row][column], '\0' };
 
       graphics_fill_rect(ctx, cell, 0, GCornerNone);
+      graphics_context_set_text_color(
+          ctx, prv_is_number_letter(row, column) ||
+                       prv_is_minute_quantity_letter(row, column) ||
+                       prv_is_common_word_letter(row, column)
+                   ? GColorWhite
+                   : GColorDarkGray);
       graphics_draw_text(ctx, letter, font, cell,
                          GTextOverflowModeTrailingEllipsis,
                          GTextAlignmentCenter, NULL);
     }
   }
+
+  prv_draw_minute_dots(ctx, bounds, cell_width);
 }
 
 static void prv_window_load(Window *window) {
