@@ -90,9 +90,31 @@ static bool prv_is_quarter_letter(uint8_t row, uint8_t column) {
 }
 
 static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
-  (void)row;
-  (void)column;
-  return false;
+  if (s_minutes < 5 || (s_minutes >= 15 && s_minutes < 20) ||
+      (s_minutes >= 30 && s_minutes < 35) ||
+      (s_minutes >= 45 && s_minutes < 50)) {
+    return false;
+  }
+
+  const bool is_minutes_past = s_minutes < 30;
+  if ((is_minutes_past &&
+       prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
+      (!is_minutes_past && prv_is_word_letter(CLOCK_WORD_TO, row, column))) {
+    return true;
+  }
+
+  const uint8_t quantity = s_minutes_rounded_to_five <= 30
+                               ? s_minutes_rounded_to_five
+                               : 60 - s_minutes_rounded_to_five;
+  ClockGridWord word;
+  if (clock_language_get_minute_quantity(s_clock_language, quantity, &word) &&
+      row == word.row && column >= word.column &&
+      column < word.column + word.length) {
+    return true;
+  }
+
+  return prv_is_hour_number_letter(
+      s_hours + (is_minutes_past ? 0 : 1), row, column);
 }
 
 static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
