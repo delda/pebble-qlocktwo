@@ -40,17 +40,22 @@ static bool prv_is_word_letter(ClockWord requested_word, uint8_t row,
          column < word.column + word.length;
 }
 
+static bool prv_is_hour_number_letter(uint8_t hour, uint8_t row,
+                                      uint8_t column) {
+  const uint8_t hour_on_clock = hour % 12;
+  const uint8_t display_hour = hour_on_clock == 0 ? 12 : hour_on_clock;
+  ClockGridWord word;
+  return clock_language_get_number(s_clock_language, display_hour, &word) &&
+         row == word.row && column >= word.column &&
+         column < word.column + word.length;
+}
+
 static bool prv_is_number_letter(uint8_t row, uint8_t column) {
   if (s_minutes >= 5) {
     return false;
   }
 
-  const uint8_t hour = s_hours % 12;
-  const uint8_t display_hour = hour == 0 ? 12 : hour;
-  ClockGridWord word;
-  return clock_language_get_number(s_clock_language, display_hour, &word) &&
-         row == word.row && column >= word.column &&
-         column < word.column + word.length;
+  return prv_is_hour_number_letter(s_hours, row, column);
 }
 
 static bool prv_is_half_past_letter(uint8_t row, uint8_t column) {
@@ -63,12 +68,25 @@ static bool prv_is_half_past_letter(uint8_t row, uint8_t column) {
     return true;
   }
 
-  const uint8_t hour = s_hours % 12;
-  const uint8_t display_hour = hour == 0 ? 12 : hour;
-  ClockGridWord word;
-  return clock_language_get_number(s_clock_language, display_hour, &word) &&
-         row == word.row && column >= word.column &&
-         column < word.column + word.length;
+  return prv_is_hour_number_letter(s_hours, row, column);
+}
+
+static bool prv_is_quarter_letter(uint8_t row, uint8_t column) {
+  const bool is_quarter_past = s_minutes >= 15 && s_minutes < 20;
+  const bool is_quarter_to = s_minutes >= 45 && s_minutes < 50;
+  if (!is_quarter_past && !is_quarter_to) {
+    return false;
+  }
+
+  if (prv_is_word_letter(CLOCK_WORD_A, row, column) ||
+      prv_is_word_letter(CLOCK_WORD_QUARTER, row, column) ||
+      (is_quarter_past && prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
+      (is_quarter_to && prv_is_word_letter(CLOCK_WORD_TO, row, column))) {
+    return true;
+  }
+
+  return prv_is_hour_number_letter(s_hours + (is_quarter_to ? 1 : 0), row,
+                                   column);
 }
 
 static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
@@ -123,6 +141,7 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       graphics_context_set_text_color(
           ctx, prv_is_number_letter(row, column) ||
                        prv_is_half_past_letter(row, column) ||
+                       prv_is_quarter_letter(row, column) ||
                        prv_is_minute_quantity_letter(row, column) ||
                        prv_is_common_word_letter(row, column)
                    ? GColorWhite
