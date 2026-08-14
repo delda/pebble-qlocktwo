@@ -53,6 +53,24 @@ static bool prv_is_number_letter(uint8_t row, uint8_t column) {
          column < word.column + word.length;
 }
 
+static bool prv_is_half_past_letter(uint8_t row, uint8_t column) {
+  if (s_minutes < 30 || s_minutes >= 35) {
+    return false;
+  }
+
+  if (prv_is_word_letter(CLOCK_WORD_HALF, row, column) ||
+      prv_is_word_letter(CLOCK_WORD_PAST, row, column)) {
+    return true;
+  }
+
+  const uint8_t hour = s_hours % 12;
+  const uint8_t display_hour = hour == 0 ? 12 : hour;
+  ClockGridWord word;
+  return clock_language_get_number(s_clock_language, display_hour, &word) &&
+         row == word.row && column >= word.column &&
+         column < word.column + word.length;
+}
+
 static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
   (void)row;
   (void)column;
@@ -104,6 +122,7 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       graphics_fill_rect(ctx, cell, 0, GCornerNone);
       graphics_context_set_text_color(
           ctx, prv_is_number_letter(row, column) ||
+                       prv_is_half_past_letter(row, column) ||
                        prv_is_minute_quantity_letter(row, column) ||
                        prv_is_common_word_letter(row, column)
                    ? GColorWhite
