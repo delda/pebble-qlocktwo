@@ -15,9 +15,9 @@ pebble install --phone <ip>           # install to a paired phone
 ## Target platforms
 
 `targetPlatforms` in `package.json` controls which watches you build for. The
-modern Pebble hardware is **emery** (Pebble Time 2), **gabbro** (Pebble Round
-2), and **flint** (Pebble 2 Duo); the original Pebble platforms (aplite,
-basalt, chalk, diorite) are included by default for backwards compatibility.
+round platforms, **chalk** (Pebble Time Round) and **gabbro** (Pebble Round 2),
+are excluded. The remaining targets are emery (Pebble Time 2), flint (Pebble 2
+Duo), and the original aplite, basalt, and diorite platforms.
 
 ## Project layout
 

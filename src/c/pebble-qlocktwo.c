@@ -15,6 +15,14 @@ static uint8_t s_seconds;
 static uint8_t s_minutes_rounded_to_five;
 static uint8_t s_minutes_modulo_five;
 
+static void prv_inbox_received_handler(DictionaryIterator *iterator,
+                                       void *context) {
+  // Clay delivers the selected settings here. They do not alter the watchface
+  // yet because English and Black are currently the only available choices.
+  (void)iterator;
+  (void)context;
+}
+
 static void prv_update_time(struct tm *tick_time) {
   s_hours = tick_time->tm_hour;
   s_minutes = tick_time->tm_min;
@@ -198,6 +206,10 @@ static void prv_init(void) {
     .unload = prv_window_unload,
   });
   window_stack_push(s_window, true);
+
+  app_message_register_inbox_received(prv_inbox_received_handler);
+  app_message_open(app_message_inbox_size_maximum(),
+                   app_message_outbox_size_maximum());
 
   time_t now = time(NULL);
   prv_update_time(localtime(&now));

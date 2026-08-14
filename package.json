@@ -2,9 +2,13 @@
   "name": "pebble-qlocktwo",
   "author": "MakeAwesomeHappen",
   "version": "1.0.0",
-  "keywords": ["pebble-app"],
+  "keywords": [
+    "pebble-app"
+  ],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "@rebble/clay": "^1.0.10"
+  },
   "pebble": {
     "displayName": "pebble-qlocktwo",
     "uuid": "541c1176-8eb5-4105-aa83-1cd0214166ee",
@@ -13,17 +17,16 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "chalk",
       "diorite",
       "emery",
-      "flint",
-      "gabbro"
+      "flint"
     ],
     "watchapp": {
       "watchface": true
     },
     "messageKeys": [
-      "dummy"
+      "Language",
+      "Color"
     ],
     "resources": {
       "media": []

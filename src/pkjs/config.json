@@ -1,0 +1,35 @@
+[
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "WORD CLOCK"
+      },
+      {
+        "type": "select",
+        "messageKey": "Language",
+        "label": "Language",
+        "defaultValue": "en",
+        "options": [
+          {
+            "label": "English",
+            "value": "en"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "messageKey": "Color",
+        "label": "Color",
+        "defaultValue": "black",
+        "options": [
+          {
+            "label": "Black",
+            "value": "black"
+          }
+        ]
+      }
+    ]
+  }
+]
