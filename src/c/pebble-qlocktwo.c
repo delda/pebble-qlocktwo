@@ -41,7 +41,7 @@ static bool prv_is_word_letter(ClockWord requested_word, uint8_t row,
 }
 
 static bool prv_is_number_letter(uint8_t row, uint8_t column) {
-  if (s_minutes_rounded_to_five != 0) {
+  if (s_minutes >= 5) {
     return false;
   }
 
@@ -65,7 +65,7 @@ static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
     return true;
   }
 
-  return s_minutes_rounded_to_five == 0 &&
+  return s_minutes < 5 &&
          prv_is_word_letter(CLOCK_WORD_OCLOCK, row, column);
 }
 
