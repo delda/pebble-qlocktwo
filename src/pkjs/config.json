@@ -27,8 +27,16 @@
           {
             "label": "Black",
             "value": "black"
+          },
+          {
+            "label": "White",
+            "value": "white"
           }
         ]
+      },
+      {
+        "type": "submit",
+        "defaultValue": "Save settings"
       }
     ]
   }

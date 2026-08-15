@@ -1,9 +1,11 @@
 #include <pebble.h>
 
 #include "clock_language.h"
+#include "color_theme.h"
 
 #define GRID_COLUMNS 11
 #define GRID_ROWS CLOCK_GRID_ROWS
+#define PERSIST_KEY_COLOR_THEME 1
 
 static Window *s_window;
 static Layer *s_grid_layer;
@@ -14,12 +16,17 @@ static uint8_t s_minutes;
 static uint8_t s_seconds;
 static uint8_t s_minutes_rounded_to_five;
 static uint8_t s_minutes_modulo_five;
+static ColorThemeId s_color_theme = COLOR_THEME_BLACK;
 
 static void prv_inbox_received_handler(DictionaryIterator *iterator,
                                        void *context) {
-  // Clay delivers the selected settings here. They do not alter the watchface
-  // yet because English and Black are currently the only available choices.
-  (void)iterator;
+  Tuple *color = dict_find(iterator, MESSAGE_KEY_Color);
+  if (color && color->type == TUPLE_CSTRING) {
+    s_color_theme = color_theme_id_from_string(color->value->cstring);
+    persist_write_int(PERSIST_KEY_COLOR_THEME, s_color_theme);
+    layer_mark_dirty(s_grid_layer);
+  }
+
   (void)context;
 }
 
@@ -141,7 +148,8 @@ static void prv_draw_minute_dots(GContext *ctx, GRect bounds,
   static const uint8_t s_dot_boundaries[] = { 4, 5, 6, 7 };
   const int16_t dot_y = bounds.size.h - 3;
 
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx,
+                                  color_theme_get(s_color_theme)->active_text);
   for (uint8_t index = 0; index < s_minutes_modulo_five; ++index) {
     graphics_fill_circle(ctx,
                          GPoint(s_dot_boundaries[index] * cell_width, dot_y), 2);
@@ -153,8 +161,9 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   const int16_t cell_width = bounds.size.w / GRID_COLUMNS;
   const int16_t cell_height = bounds.size.h / GRID_ROWS;
   const GFont font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  const ColorTheme *theme = color_theme_get(s_color_theme);
 
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, theme->background);
 
   for (int row = 0; row < GRID_ROWS; ++row) {
     for (int column = 0; column < GRID_COLUMNS; ++column) {
@@ -166,16 +175,17 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
                                                      : cell_height;
       const GRect cell = GRect(x, y, width, height);
       const char letter[] = { s_letter_grid[row][column], '\0' };
+      const bool is_active =
+          prv_is_number_letter(row, column) ||
+          prv_is_half_past_letter(row, column) ||
+          prv_is_quarter_letter(row, column) ||
+          prv_is_minute_quantity_letter(row, column) ||
+          prv_is_common_word_letter(row, column);
 
       graphics_fill_rect(ctx, cell, 0, GCornerNone);
-      graphics_context_set_text_color(
-          ctx, prv_is_number_letter(row, column) ||
-                       prv_is_half_past_letter(row, column) ||
-                       prv_is_quarter_letter(row, column) ||
-                       prv_is_minute_quantity_letter(row, column) ||
-                       prv_is_common_word_letter(row, column)
-                   ? GColorWhite
-                   : GColorDarkGray);
+      graphics_context_set_text_color(ctx,
+                                      is_active ? theme->active_text
+                                                : theme->inactive_text);
       graphics_draw_text(ctx, letter, font, cell,
                          GTextOverflowModeTrailingEllipsis,
                          GTextAlignmentCenter, NULL);
@@ -199,6 +209,9 @@ static void prv_window_unload(Window *window) {
 
 static void prv_init(void) {
   s_letter_grid = clock_language_get_grid(s_clock_language);
+  if (persist_exists(PERSIST_KEY_COLOR_THEME)) {
+    s_color_theme = persist_read_int(PERSIST_KEY_COLOR_THEME);
+  }
 
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {
