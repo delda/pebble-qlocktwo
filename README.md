@@ -1,38 +1,68 @@
-# pebble-qlocktwo
+# Word Clock for Pebble
 
-A minimal Pebble watchface written in C using the Pebble SDK. It shows only
-the current hour and minute, centred on the display, and follows the watch's
-12/24-hour preference.
+A Pebble watchface inspired by QLOCKTWO. It displays the current time as words
+in an English letter grid.
 
-## Building & running
+## How it works
+
+The watchface highlights the words that describe the time, rounded down to the
+nearest five minutes:
+
+- `IT IS FIVE PAST TEN`
+- `IT IS A QUARTER TO THREE`
+- `IT IS HALF PAST SEVEN`
+
+The four dots at the bottom of the display indicate the remaining minutes. For
+example, at 10:07 the watchface shows `IT IS FIVE PAST TEN` and two dots.
+
+The grid and time phrases are currently available in English only.
+
+## Customisation
+
+The configuration screen in the Pebble/Rebble app lets you choose the
+watchface colour: black, white, red, purple, azure, green, pink, or brown. The
+choice is stored on the watch and retained across restarts.
+
+## Supported platforms
+
+- aplite — Pebble
+- basalt — Pebble Time
+- diorite — Pebble Time Steel
+- emery — Pebble Time 2
+- flint — Pebble 2
+
+The round chalk and gabbro platforms are not supported.
+
+## Development
+
+Requires Pebble SDK 3 and the project's JavaScript dependencies:
 
 ```sh
-pebble build                          # build for all targetPlatforms
-pebble install --emulator emery       # install on the emery emulator
-pebble install --phone <ip>           # install to a paired phone
+npm install
+pebble build
 ```
 
-## Target platforms
+To try the watchface in the Emery emulator:
 
-`targetPlatforms` in `package.json` controls which watches you build for. The
-round platforms, **chalk** (Pebble Time Round) and **gabbro** (Pebble Round 2),
-are excluded. The remaining targets are emery (Pebble Time 2), flint (Pebble 2
-Duo), and the original aplite, basalt, and diorite platforms.
+```sh
+pebble install --emulator emery
+```
+
+Or to install it on a paired phone:
+
+```sh
+pebble install --phone <ip>
+```
 
 ## Project layout
 
 ```
-src/c/           C source for the watchapp
-src/pkjs/        PebbleKit JS (phone-side) source, if any
-worker_src/c/    Background worker source, if any
-resources/       Images, fonts, and other bundled resources
-package.json     Project metadata (UUID, platforms, resources, message keys)
-wscript          Build rules — usually no need to edit
+src/c/                 Watchface logic and grid rendering
+src/pkjs/              PebbleKit JS / Clay configuration
+resources/fonts/       Stencil font bundled with the app
+resources/images/      Watchface icon
+package.json           Metadata, platforms, resources, and message keys
+wscript                Pebble build rules
 ```
 
-This project is configured as a watchface (`pebble.watchapp.watchface` is
-`true` in `package.json`).
-
-## Documentation
-
-Full SDK docs, tutorials, and API reference: <https://developer.repebble.com>
+For SDK documentation, see <https://developer.rebble.io>.

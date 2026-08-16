@@ -1,7 +1,7 @@
 {
-  "name": "pebble-qlocktwo",
+  "name": "word-clock",
   "author": "MakeAwesomeHappen",
-  "version": "1.0.0",
+  "version": "1.1.3",
   "keywords": [
     "pebble-app"
   ],
@@ -10,7 +10,7 @@
     "@rebble/clay": "^1.0.10"
   },
   "pebble": {
-    "displayName": "pebble-qlocktwo",
+    "displayName": "Word Clock",
     "uuid": "541c1176-8eb5-4105-aa83-1cd0214166ee",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -29,7 +29,20 @@
       "Color"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_WORDCLOCK_STENCIL_MONO_18",
+          "file": "fonts/WordclockStencilMono-Regular.ttf",
+          "characterRegex": "[A-Z]"
+        },
+        {
+          "type": "png",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/wordclock-icon-25.png",
+          "menuIcon": true
+        }
+      ]
     }
   }
 }

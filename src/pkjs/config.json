@@ -31,6 +31,30 @@
           {
             "label": "White",
             "value": "white"
+          },
+          {
+            "label": "Red",
+            "value": "red"
+          },
+          {
+            "label": "Purple",
+            "value": "purple"
+          },
+          {
+            "label": "Azure",
+            "value": "azure"
+          },
+          {
+            "label": "Green",
+            "value": "green"
+          },
+          {
+            "label": "Pink",
+            "value": "pink"
+          },
+          {
+            "label": "Brown",
+            "value": "brown"
           }
         ]
       },

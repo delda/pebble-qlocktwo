@@ -12,6 +12,12 @@ typedef struct {
 typedef enum {
   COLOR_THEME_BLACK,
   COLOR_THEME_WHITE,
+  COLOR_THEME_RED,
+  COLOR_THEME_PURPLE,
+  COLOR_THEME_AZURE,
+  COLOR_THEME_GREEN,
+  COLOR_THEME_PINK,
+  COLOR_THEME_BROWN,
   COLOR_THEME_COUNT,
 } ColorThemeId;
 
@@ -20,4 +26,3 @@ const ColorTheme *color_theme_get(ColorThemeId id);
 
 // Converts a value received from Clay to a theme id. Unknown values use black.
 ColorThemeId color_theme_id_from_string(const char *value);
-

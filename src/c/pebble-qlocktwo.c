@@ -2,6 +2,7 @@
 
 #include "clock_language.h"
 #include "color_theme.h"
+#include "screen_layout.h"
 
 #define GRID_COLUMNS 11
 #define GRID_ROWS CLOCK_GRID_ROWS
@@ -9,6 +10,7 @@
 
 static Window *s_window;
 static Layer *s_grid_layer;
+static GFont s_letter_font;
 static const ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const char *const *s_letter_grid;
 static uint8_t s_hours;
@@ -142,38 +144,18 @@ static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
          prv_is_word_letter(CLOCK_WORD_OCLOCK, row, column);
 }
 
-static void prv_draw_minute_dots(GContext *ctx, GRect bounds,
-                                 int16_t cell_width) {
-  // The dots sit between S/E, E/O, O/C, and C/L in "TENSEOCLOCK".
-  static const uint8_t s_dot_boundaries[] = { 4, 5, 6, 7 };
-  const int16_t dot_y = bounds.size.h - 3;
-
-  graphics_context_set_fill_color(ctx,
-                                  color_theme_get(s_color_theme)->active_text);
-  for (uint8_t index = 0; index < s_minutes_modulo_five; ++index) {
-    graphics_fill_circle(ctx,
-                         GPoint(s_dot_boundaries[index] * cell_width, dot_y), 2);
-  }
-}
-
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-  const int16_t cell_width = bounds.size.w / GRID_COLUMNS;
-  const int16_t cell_height = bounds.size.h / GRID_ROWS;
-  const GFont font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  const ScreenLayout layout = screen_layout_create(layer_get_bounds(layer),
+                                                    GRID_COLUMNS, GRID_ROWS,
+                                                    s_letter_font);
   const ColorTheme *theme = color_theme_get(s_color_theme);
 
   graphics_context_set_fill_color(ctx, theme->background);
 
   for (int row = 0; row < GRID_ROWS; ++row) {
     for (int column = 0; column < GRID_COLUMNS; ++column) {
-      const int16_t x = column * cell_width;
-      const int16_t y = row * cell_height;
-      const int16_t width = (column == GRID_COLUMNS - 1) ? bounds.size.w - x
-                                                          : cell_width;
-      const int16_t height = (row == GRID_ROWS - 1) ? bounds.size.h - y
-                                                     : cell_height;
-      const GRect cell = GRect(x, y, width, height);
+      const GRect cell = screen_layout_cell_rect(&layout, row, column,
+                                                 GRID_COLUMNS, GRID_ROWS);
       const char letter[] = { s_letter_grid[row][column], '\0' };
       const bool is_active =
           prv_is_number_letter(row, column) ||
@@ -186,18 +168,21 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       graphics_context_set_text_color(ctx,
                                       is_active ? theme->active_text
                                                 : theme->inactive_text);
-      graphics_draw_text(ctx, letter, font, cell,
+      graphics_draw_text(ctx, letter, layout.letter_font, cell,
                          GTextOverflowModeTrailingEllipsis,
                          GTextAlignmentCenter, NULL);
     }
   }
 
-  prv_draw_minute_dots(ctx, bounds, cell_width);
+  screen_layout_draw_minute_dots(ctx, &layout, s_minutes_modulo_five,
+                                 theme->active_text);
 }
 
 static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
 
+  s_letter_font = fonts_load_custom_font(
+      resource_get_handle(RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18));
   s_grid_layer = layer_create(layer_get_bounds(window_layer));
   layer_set_update_proc(s_grid_layer, prv_grid_layer_update);
   layer_add_child(window_layer, s_grid_layer);
@@ -205,6 +190,7 @@ static void prv_window_load(Window *window) {
 
 static void prv_window_unload(Window *window) {
   layer_destroy(s_grid_layer);
+  fonts_unload_custom_font(s_letter_font);
 }
 
 static void prv_init(void) {
