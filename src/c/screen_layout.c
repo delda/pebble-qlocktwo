@@ -3,12 +3,19 @@
 #define DOT_REFERENCE_DISPLAY_HEIGHT 168
 #define DOT_REFERENCE_BOTTOM_OFFSET 5
 #define DOT_RADIUS 2
-#define GRID_VERTICAL_OFFSET -9
+#define GRID_REFERENCE_DISPLAY_HEIGHT 228
+#define GRID_REFERENCE_VERTICAL_OFFSET 9
 
 static int16_t prv_scale_from_reference_height(int16_t value,
                                                int16_t display_height) {
   return (value * display_height + DOT_REFERENCE_DISPLAY_HEIGHT / 2) /
          DOT_REFERENCE_DISPLAY_HEIGHT;
+}
+
+static int16_t prv_grid_vertical_offset(int16_t display_height) {
+  return -(GRID_REFERENCE_VERTICAL_OFFSET * display_height +
+           GRID_REFERENCE_DISPLAY_HEIGHT / 2) /
+         GRID_REFERENCE_DISPLAY_HEIGHT;
 }
 
 ScreenLayout screen_layout_create(GRect bounds, uint8_t columns, uint8_t rows,
@@ -28,7 +35,8 @@ ScreenLayout screen_layout_create(GRect bounds, uint8_t columns, uint8_t rows,
 GRect screen_layout_cell_rect(const ScreenLayout *layout, uint8_t row,
                               uint8_t column, uint8_t columns, uint8_t rows) {
   const int16_t x = column * layout->cell_width;
-  const int16_t y = row * layout->cell_height + GRID_VERTICAL_OFFSET;
+  const int16_t y = row * layout->cell_height +
+                    prv_grid_vertical_offset(layout->bounds.size.h);
   const int16_t width = column == columns - 1 ? layout->bounds.size.w - x
                                                 : layout->cell_width;
   const int16_t height = row == rows - 1 ? layout->bounds.size.h - y

@@ -178,11 +178,22 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
                                  theme->active_text);
 }
 
+static uint32_t prv_letter_font_resource_id(void) {
+  return PBL_PLATFORM_SWITCH(
+      PBL_PLATFORM_TYPE_CURRENT, RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_26,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18,
+      RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18);
+}
+
 static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
 
   s_letter_font = fonts_load_custom_font(
-      resource_get_handle(RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_26));
+      resource_get_handle(prv_letter_font_resource_id()));
   s_grid_layer = layer_create(layer_get_bounds(window_layer));
   layer_set_update_proc(s_grid_layer, prv_grid_layer_update);
   layer_add_child(window_layer, s_grid_layer);
