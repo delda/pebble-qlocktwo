@@ -151,6 +151,7 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   const ColorTheme *theme = color_theme_get(s_color_theme);
 
   graphics_context_set_fill_color(ctx, theme->background);
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 
   for (int row = 0; row < GRID_ROWS; ++row) {
     for (int column = 0; column < GRID_COLUMNS; ++column) {
@@ -164,7 +165,6 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
           prv_is_minute_quantity_letter(row, column) ||
           prv_is_common_word_letter(row, column);
 
-      graphics_fill_rect(ctx, cell, 0, GCornerNone);
       graphics_context_set_text_color(ctx,
                                       is_active ? theme->active_text
                                                 : theme->inactive_text);
@@ -182,7 +182,7 @@ static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
 
   s_letter_font = fonts_load_custom_font(
-      resource_get_handle(RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18));
+      resource_get_handle(RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_26));
   s_grid_layer = layer_create(layer_get_bounds(window_layer));
   layer_set_update_proc(s_grid_layer, prv_grid_layer_update);
   layer_add_child(window_layer, s_grid_layer);

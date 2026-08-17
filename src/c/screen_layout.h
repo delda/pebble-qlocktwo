@@ -6,6 +6,8 @@ typedef struct {
   GRect bounds;
   int16_t cell_width;
   int16_t cell_height;
+  int16_t row_pitch;
+  int16_t grid_top;
   int16_t minute_dot_y;
   GFont letter_font;
 } ScreenLayout;
