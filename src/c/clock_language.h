@@ -7,6 +7,7 @@
 
 typedef enum {
   CLOCK_LANGUAGE_EN,
+  CLOCK_LANGUAGE_IT,
 } ClockLanguage;
 
 typedef struct {
@@ -24,9 +25,12 @@ typedef enum {
   CLOCK_WORD_QUARTER,
   CLOCK_WORD_PAST,
   CLOCK_WORD_TO,
+  CLOCK_WORD_QUARTER_ARTICLE,
+  CLOCK_WORD_SINGULAR_PREFIX,
   CLOCK_WORD_COUNT,
 } ClockWord;
 
+ClockLanguage clock_language_from_string(const char *value);
 const char *const *clock_language_get_grid(ClockLanguage language);
 bool clock_language_get_number(ClockLanguage language, uint8_t number,
                                ClockGridWord *word);

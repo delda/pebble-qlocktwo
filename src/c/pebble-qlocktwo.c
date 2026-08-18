@@ -7,11 +7,12 @@
 #define GRID_COLUMNS 11
 #define GRID_ROWS CLOCK_GRID_ROWS
 #define PERSIST_KEY_COLOR_THEME 1
+#define PERSIST_KEY_CLOCK_LANGUAGE 2
 
 static Window *s_window;
 static Layer *s_grid_layer;
 static GFont s_letter_font;
-static const ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
+static ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const char *const *s_letter_grid;
 static uint8_t s_hours;
 static uint8_t s_minutes;
@@ -22,6 +23,14 @@ static ColorThemeId s_color_theme = COLOR_THEME_BLACK;
 
 static void prv_inbox_received_handler(DictionaryIterator *iterator,
                                        void *context) {
+  Tuple *language = dict_find(iterator, MESSAGE_KEY_Language);
+  if (language && language->type == TUPLE_CSTRING) {
+    s_clock_language = clock_language_from_string(language->value->cstring);
+    s_letter_grid = clock_language_get_grid(s_clock_language);
+    persist_write_int(PERSIST_KEY_CLOCK_LANGUAGE, s_clock_language);
+    layer_mark_dirty(s_grid_layer);
+  }
+
   Tuple *color = dict_find(iterator, MESSAGE_KEY_Color);
   if (color && color->type == TUPLE_CSTRING) {
     s_color_theme = color_theme_id_from_string(color->value->cstring);
@@ -95,6 +104,19 @@ static bool prv_is_quarter_letter(uint8_t row, uint8_t column) {
     return false;
   }
 
+  if (s_clock_language == CLOCK_LANGUAGE_IT) {
+    if (prv_is_word_letter(CLOCK_WORD_QUARTER_ARTICLE, row, column) ||
+        prv_is_word_letter(CLOCK_WORD_QUARTER, row, column) ||
+        (is_quarter_past &&
+         prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
+        (is_quarter_to && prv_is_word_letter(CLOCK_WORD_TO, row, column))) {
+      return true;
+    }
+
+    return prv_is_hour_number_letter(s_hours + (is_quarter_to ? 1 : 0), row,
+                                     column);
+  }
+
   if (prv_is_word_letter(CLOCK_WORD_A, row, column) ||
       prv_is_word_letter(CLOCK_WORD_QUARTER, row, column) ||
       (is_quarter_past && prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
@@ -135,6 +157,14 @@ static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
 }
 
 static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
+  if (s_clock_language == CLOCK_LANGUAGE_IT) {
+    const uint8_t displayed_hour =
+        s_hours + (s_minutes >= 35 ? 1 : 0);
+    if (displayed_hour % 12 == 1) {
+      return prv_is_word_letter(CLOCK_WORD_SINGULAR_PREFIX, row, column);
+    }
+  }
+
   if (prv_is_word_letter(CLOCK_WORD_IT, row, column) ||
       prv_is_word_letter(CLOCK_WORD_IS, row, column)) {
     return true;
@@ -208,6 +238,13 @@ static void prv_init(void) {
   s_letter_grid = clock_language_get_grid(s_clock_language);
   if (persist_exists(PERSIST_KEY_COLOR_THEME)) {
     s_color_theme = persist_read_int(PERSIST_KEY_COLOR_THEME);
+  }
+  if (persist_exists(PERSIST_KEY_CLOCK_LANGUAGE)) {
+    const int stored_language = persist_read_int(PERSIST_KEY_CLOCK_LANGUAGE);
+    if (stored_language == CLOCK_LANGUAGE_IT) {
+      s_clock_language = CLOCK_LANGUAGE_IT;
+      s_letter_grid = clock_language_get_grid(s_clock_language);
+    }
   }
 
   s_window = window_create();
