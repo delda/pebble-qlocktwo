@@ -19,6 +19,10 @@
           {
             "label": "Italiano",
             "value": "it"
+          },
+          {
+            "label": "Français",
+            "value": "fr"
           }
         ]
       },

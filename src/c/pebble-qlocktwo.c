@@ -68,6 +68,25 @@ static bool prv_is_word_letter(ClockWord requested_word, uint8_t row,
 
 static bool prv_is_hour_number_letter(uint8_t hour, uint8_t row,
                                       uint8_t column) {
+  if (s_clock_language == CLOCK_LANGUAGE_FR) {
+    ClockGridWord word;
+    switch (hour % 24) {
+      case 0:
+        word = (ClockGridWord) { 4, 5, 6 };  // MINUIT
+        break;
+      case 12:
+        word = (ClockGridWord) { 4, 0, 4 };  // MIDI
+        break;
+      default:
+        if (!clock_language_get_number(s_clock_language, hour % 12, &word)) {
+          return false;
+        }
+        break;
+    }
+    return row == word.row && column >= word.column &&
+           column < word.column + word.length;
+  }
+
   const uint8_t hour_on_clock = hour % 12;
   const uint8_t display_hour = hour_on_clock == 0 ? 12 : hour_on_clock;
   ClockGridWord word;
@@ -104,6 +123,20 @@ static bool prv_is_quarter_letter(uint8_t row, uint8_t column) {
     return false;
   }
 
+  if (s_clock_language == CLOCK_LANGUAGE_FR) {
+    if (prv_is_word_letter(CLOCK_WORD_QUARTER, row, column) ||
+        (is_quarter_past &&
+         prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
+        (is_quarter_to &&
+         (prv_is_word_letter(CLOCK_WORD_TO, row, column) ||
+          prv_is_word_letter(CLOCK_WORD_A, row, column)))) {
+      return true;
+    }
+
+    return prv_is_hour_number_letter(s_hours + (is_quarter_to ? 1 : 0), row,
+                                     column);
+  }
+
   if (s_clock_language == CLOCK_LANGUAGE_IT) {
     if (prv_is_word_letter(CLOCK_WORD_QUARTER_ARTICLE, row, column) ||
         prv_is_word_letter(CLOCK_WORD_QUARTER, row, column) ||
@@ -136,7 +169,7 @@ static bool prv_is_minute_quantity_letter(uint8_t row, uint8_t column) {
   }
 
   const bool is_minutes_past = s_minutes < 30;
-  if ((is_minutes_past &&
+  if (((s_clock_language != CLOCK_LANGUAGE_FR && is_minutes_past) &&
        prv_is_word_letter(CLOCK_WORD_PAST, row, column)) ||
       (!is_minutes_past && prv_is_word_letter(CLOCK_WORD_TO, row, column))) {
     return true;
@@ -163,6 +196,22 @@ static bool prv_is_common_word_letter(uint8_t row, uint8_t column) {
     if (displayed_hour % 12 == 1) {
       return prv_is_word_letter(CLOCK_WORD_SINGULAR_PREFIX, row, column);
     }
+  }
+
+  if (s_clock_language == CLOCK_LANGUAGE_FR) {
+    if (prv_is_word_letter(CLOCK_WORD_IT, row, column) ||
+        prv_is_word_letter(CLOCK_WORD_IS, row, column)) {
+      return true;
+    }
+
+    const uint8_t displayed_hour = s_hours + (s_minutes >= 35 ? 1 : 0);
+    if (displayed_hour % 24 == 0 || displayed_hour % 24 == 12) {
+      return false;
+    }
+    if (displayed_hour % 24 == 1) {
+      return prv_is_word_letter(CLOCK_WORD_SINGULAR_PREFIX, row, column);
+    }
+    return prv_is_word_letter(CLOCK_WORD_OCLOCK, row, column);
   }
 
   if (prv_is_word_letter(CLOCK_WORD_IT, row, column) ||
@@ -241,8 +290,9 @@ static void prv_init(void) {
   }
   if (persist_exists(PERSIST_KEY_CLOCK_LANGUAGE)) {
     const int stored_language = persist_read_int(PERSIST_KEY_CLOCK_LANGUAGE);
-    if (stored_language == CLOCK_LANGUAGE_IT) {
-      s_clock_language = CLOCK_LANGUAGE_IT;
+    if (stored_language >= CLOCK_LANGUAGE_EN &&
+        stored_language <= CLOCK_LANGUAGE_FR) {
+      s_clock_language = stored_language;
       s_letter_grid = clock_language_get_grid(s_clock_language);
     }
   }

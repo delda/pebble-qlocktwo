@@ -8,6 +8,7 @@
 typedef enum {
   CLOCK_LANGUAGE_EN,
   CLOCK_LANGUAGE_IT,
+  CLOCK_LANGUAGE_FR,
 } ClockLanguage;
 
 typedef struct {

@@ -100,9 +100,64 @@ static const ClockGridWord s_italian_words[CLOCK_WORD_COUNT] = {
   { 1, 0, 1 },  // E (for e' l'una)
 };
 
+// Matrix copied from the French QLOCKTWO front cover. The hyphen separates
+// "vingt-cinq", as on the original front cover.
+static const char *const s_french_grid[CLOCK_GRID_ROWS] = {
+  "ILNESTODEUX",
+  "QUATRETROIS",
+  "NEUFUNESEPT",
+  "HUITSIXCINQ",
+  "MIDIXMINUIT",
+  "ONZERHEURES",
+  "MOINSOLEDIX",
+  "ETRQUARTPMD",
+  "VINGT-CINQU",
+  "ETSDEMIEPAM",
+};
+
+static const ClockGridWord s_french_numbers[12] = {
+  { 2, 4, 3 },  // UNE
+  { 0, 7, 4 },  // DEUX
+  { 1, 6, 5 },  // TROIS
+  { 1, 0, 6 },  // QUATRE
+  { 3, 7, 4 },  // CINQ
+  { 3, 4, 3 },  // SIX
+  { 2, 7, 4 },  // SEPT
+  { 3, 0, 4 },  // HUIT
+  { 2, 0, 4 },  // NEUF
+  { 4, 3, 3 },  // DIX
+  { 5, 0, 4 },  // ONZE
+  { 4, 0, 4 },  // MIDI
+};
+
+static const ClockGridWord s_french_minute_quantities[] = {
+  { 8, 6, 4 },   // CINQ
+  { 6, 8, 3 },   // DIX
+  { 8, 0, 5 },   // VINGT
+  { 8, 0, 10 },  // VINGT-CINQ
+};
+
+static const ClockGridWord s_french_words[CLOCK_WORD_COUNT] = {
+  { 0, 0, 2 },  // IL
+  { 0, 3, 3 },  // EST
+  { 6, 6, 2 },  // LE
+  { 5, 5, 6 },  // HEURES
+  { 9, 3, 5 },  // DEMIE
+  { 7, 3, 5 },  // QUART
+  { 7, 0, 2 },  // ET
+  { 6, 0, 5 },  // MOINS
+  { 6, 6, 2 },  // LE
+  { 5, 5, 5 },  // HEURE
+};
+
 ClockLanguage clock_language_from_string(const char *value) {
-  return value && strcmp(value, "it") == 0 ? CLOCK_LANGUAGE_IT
-                                             : CLOCK_LANGUAGE_EN;
+  if (value && strcmp(value, "it") == 0) {
+    return CLOCK_LANGUAGE_IT;
+  }
+  if (value && strcmp(value, "fr") == 0) {
+    return CLOCK_LANGUAGE_FR;
+  }
+  return CLOCK_LANGUAGE_EN;
 }
 
 const char *const *clock_language_get_grid(ClockLanguage language) {
@@ -112,6 +167,8 @@ const char *const *clock_language_get_grid(ClockLanguage language) {
       return s_english_grid;
     case CLOCK_LANGUAGE_IT:
       return s_italian_grid;
+    case CLOCK_LANGUAGE_FR:
+      return s_french_grid;
   }
 }
 
@@ -127,6 +184,9 @@ bool clock_language_get_number(ClockLanguage language, uint8_t number,
       return true;
     case CLOCK_LANGUAGE_IT:
       *word = s_italian_numbers[number - 1];
+      return true;
+    case CLOCK_LANGUAGE_FR:
+      *word = s_french_numbers[number - 1];
       return true;
     default:
       return false;
@@ -174,6 +234,23 @@ bool clock_language_get_minute_quantity(ClockLanguage language, uint8_t minutes,
         default:
           return false;
       }
+    case CLOCK_LANGUAGE_FR:
+      switch (minutes) {
+        case 5:
+          *word = s_french_minute_quantities[0];
+          return true;
+        case 10:
+          *word = s_french_minute_quantities[1];
+          return true;
+        case 20:
+          *word = s_french_minute_quantities[2];
+          return true;
+        case 25:
+          *word = s_french_minute_quantities[3];
+          return true;
+        default:
+          return false;
+      }
     default:
       return false;
   }
@@ -191,6 +268,9 @@ bool clock_language_get_word(ClockLanguage language, ClockWord requested_word,
       return true;
     case CLOCK_LANGUAGE_IT:
       *word = s_italian_words[requested_word];
+      return true;
+    case CLOCK_LANGUAGE_FR:
+      *word = s_french_words[requested_word];
       return true;
     default:
       return false;

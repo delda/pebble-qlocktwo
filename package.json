@@ -35,14 +35,14 @@
           "name": "FONT_WORDCLOCK_STENCIL_MONO_26",
           "file": "fonts/WordclockStencilMono-Regular.ttf",
           "pixelHeight": 26,
-          "characterRegex": "[A-Z]"
+          "characterRegex": "[A-Z-]"
         },
         {
           "type": "font",
           "name": "FONT_WORDCLOCK_STENCIL_MONO_18",
           "file": "fonts/WordclockStencilMono-Regular.ttf",
           "pixelHeight": 18,
-          "characterRegex": "[A-Z]"
+          "characterRegex": "[A-Z-]"
         },
         {
           "type": "png",
