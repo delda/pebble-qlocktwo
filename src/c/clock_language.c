@@ -150,12 +150,64 @@ static const ClockGridWord s_french_words[CLOCK_WORD_COUNT] = {
   { 5, 5, 5 },  // HEURE
 };
 
+// Matrix copied from the Spanish QLOCKTWO front cover.
+static const char *const s_spanish_grid[CLOCK_GRID_ROWS] = {
+  "ESONELASUNA",
+  "DOSITRESORE",
+  "CUATROCINCO",
+  "SEISASIETEN",
+  "OCHONUEVEYO",
+  "LADIEZSONCE",
+  "DOCELYMENOS",
+  "OVEINTEDIEZ",
+  "VEINTICINCO",
+  "MEDIACUARTO",
+};
+
+static const ClockGridWord s_spanish_numbers[12] = {
+  { 0, 8, 3 },  // UNA
+  { 1, 0, 3 },  // DOS
+  { 1, 4, 4 },  // TRES
+  { 2, 0, 6 },  // CUATRO
+  { 2, 6, 5 },  // CINCO
+  { 3, 0, 4 },  // SEIS
+  { 3, 5, 5 },  // SIETE
+  { 4, 0, 4 },  // OCHO
+  { 4, 4, 5 },  // NUEVE
+  { 5, 2, 4 },  // DIEZ
+  { 5, 7, 4 },  // ONCE
+  { 6, 0, 4 },  // DOCE
+};
+
+static const ClockGridWord s_spanish_minute_quantities[] = {
+  { 2, 6, 5 },  // CINCO
+  { 7, 7, 4 },  // DIEZ
+  { 7, 1, 6 },  // VEINTE
+  { 8, 0, 11 }, // VEINTICINCO
+};
+
+static const ClockGridWord s_spanish_words[CLOCK_WORD_COUNT] = {
+  { 0, 0, 2 },  // ES
+  { 0, 1, 3 },  // SON
+  { 0, 5, 2 },  // LA
+  { 0, 5, 3 },  // LAS
+  { 9, 0, 5 },  // MEDIA
+  { 9, 5, 6 },  // CUARTO
+  { 6, 5, 1 },  // Y
+  { 6, 6, 5 },  // MENOS
+  { 0, 5, 2 },  // LA
+  { 0, 5, 2 },  // LA
+};
+
 ClockLanguage clock_language_from_string(const char *value) {
   if (value && strcmp(value, "it") == 0) {
     return CLOCK_LANGUAGE_IT;
   }
   if (value && strcmp(value, "fr") == 0) {
     return CLOCK_LANGUAGE_FR;
+  }
+  if (value && strcmp(value, "es") == 0) {
+    return CLOCK_LANGUAGE_ES;
   }
   return CLOCK_LANGUAGE_EN;
 }
@@ -169,6 +221,8 @@ const char *const *clock_language_get_grid(ClockLanguage language) {
       return s_italian_grid;
     case CLOCK_LANGUAGE_FR:
       return s_french_grid;
+    case CLOCK_LANGUAGE_ES:
+      return s_spanish_grid;
   }
 }
 
@@ -187,6 +241,9 @@ bool clock_language_get_number(ClockLanguage language, uint8_t number,
       return true;
     case CLOCK_LANGUAGE_FR:
       *word = s_french_numbers[number - 1];
+      return true;
+    case CLOCK_LANGUAGE_ES:
+      *word = s_spanish_numbers[number - 1];
       return true;
     default:
       return false;
@@ -251,6 +308,23 @@ bool clock_language_get_minute_quantity(ClockLanguage language, uint8_t minutes,
         default:
           return false;
       }
+    case CLOCK_LANGUAGE_ES:
+      switch (minutes) {
+        case 5:
+          *word = s_spanish_minute_quantities[0];
+          return true;
+        case 10:
+          *word = s_spanish_minute_quantities[1];
+          return true;
+        case 20:
+          *word = s_spanish_minute_quantities[2];
+          return true;
+        case 25:
+          *word = s_spanish_minute_quantities[3];
+          return true;
+        default:
+          return false;
+      }
     default:
       return false;
   }
@@ -271,6 +345,9 @@ bool clock_language_get_word(ClockLanguage language, ClockWord requested_word,
       return true;
     case CLOCK_LANGUAGE_FR:
       *word = s_french_words[requested_word];
+      return true;
+    case CLOCK_LANGUAGE_ES:
+      *word = s_spanish_words[requested_word];
       return true;
     default:
       return false;
