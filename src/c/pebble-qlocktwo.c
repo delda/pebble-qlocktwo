@@ -270,7 +270,14 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       graphics_context_set_text_color(ctx,
                                       is_active ? theme->active_text
                                                 : theme->inactive_text);
+      // Pebble custom fonts have no bold style; draw a second, one-pixel-shifted
+      // glyph to give every letter a consistent bold weight.
       graphics_draw_text(ctx, letter, layout.letter_font, cell,
+                         GTextOverflowModeTrailingEllipsis,
+                         GTextAlignmentCenter, NULL);
+      graphics_draw_text(ctx, letter, layout.letter_font,
+                         GRect(cell.origin.x + 1, cell.origin.y,
+                               cell.size.w, cell.size.h),
                          GTextOverflowModeTrailingEllipsis,
                          GTextAlignmentCenter, NULL);
     }
