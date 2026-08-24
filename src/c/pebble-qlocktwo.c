@@ -12,7 +12,6 @@ static Layer *s_grid_layer;
 static GFont s_letter_font;
 static ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const ClockLanguageProfile *s_clock_profile;
-static const char *const *s_letter_grid;
 static uint8_t s_hours;
 static uint8_t s_minutes_rounded_to_five;
 static uint8_t s_minutes_modulo_five;
@@ -24,7 +23,6 @@ static void prv_inbox_received_handler(DictionaryIterator *iterator,
   if (language && language->type == TUPLE_CSTRING) {
     s_clock_language = clock_language_from_string(language->value->cstring);
     s_clock_profile = clock_language_get_profile(s_clock_language);
-    s_letter_grid = s_clock_profile->grid;
     persist_write_int(PERSIST_KEY_CLOCK_LANGUAGE, s_clock_language);
     layer_mark_dirty(s_grid_layer);
   }
@@ -82,8 +80,12 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
   }
 
   if (number &&
-      prv_is_grid_word_letter(&s_clock_profile->numbers[number - 1], row,
-                              column)) {
+      prv_is_grid_word_letter(
+          &s_clock_profile->number_forms[
+              active_words & s_clock_profile->oclock_words
+                  ? CLOCK_NUMBER_FORM_OCLOCK
+                  : CLOCK_NUMBER_FORM_DEFAULT][number - 1], row,
+          column)) {
     return true;
   }
 
@@ -111,7 +113,11 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       const GRect cell = screen_layout_cell_rect(&layout, row, column,
                                                  CLOCK_GRID_COLUMNS,
                                                  CLOCK_GRID_ROWS);
-      const char letter[] = { s_letter_grid[row][column], '\0' };
+      char letter[5];
+      if (!clock_language_get_grid_letter(s_clock_profile, row, column,
+                                          letter)) {
+        continue;
+      }
       const bool is_active = prv_is_phrase_letter(row, column);
 
       graphics_context_set_text_color(ctx,
@@ -162,7 +168,6 @@ static void prv_window_unload(Window *window) {
 
 static void prv_init(void) {
   s_clock_profile = clock_language_get_profile(s_clock_language);
-  s_letter_grid = s_clock_profile->grid;
   if (persist_exists(PERSIST_KEY_COLOR_THEME)) {
     s_color_theme = persist_read_int(PERSIST_KEY_COLOR_THEME);
   }
@@ -172,7 +177,6 @@ static void prv_init(void) {
         stored_language < CLOCK_LANGUAGE_COUNT) {
       s_clock_language = stored_language;
       s_clock_profile = clock_language_get_profile(s_clock_language);
-      s_letter_grid = s_clock_profile->grid;
     }
   }
 

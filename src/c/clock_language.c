@@ -15,6 +15,17 @@ typedef enum {
 } EnglishWord;
 
 typedef enum {
+  DE_WORD_ES,
+  DE_WORD_IST,
+  DE_WORD_UHR,
+  DE_WORD_HALB,
+  DE_WORD_VIERTEL,
+  DE_WORD_NACH,
+  DE_WORD_VOR,
+  DE_WORD_COUNT,
+} GermanWord;
+
+typedef enum {
   IT_WORD_SONO,
   IT_WORD_LE,
   IT_WORD_AND,
@@ -98,6 +109,69 @@ static const ClockGridWord s_english_words[EN_WORD_COUNT] = {
   { 1, 2, 7 },  // QUARTER
   { 4, 0, 4 },  // PAST
   { 3, 9, 2 },  // TO
+};
+
+// Matrix copied from the standard German QLOCKTWO front cover.
+static const char *const s_german_grid[CLOCK_GRID_ROWS] = {
+  "ESKISTAF\u00dcNF",
+  "ZEHNZWANZIG",
+  "DREIVIERTEL",
+  "TGNACHVORJM",
+  "HALBQZW\u00d6LF",
+  "ZWEINSIEBEN",
+  "KDREIRHF\u00dcNF",
+  "ELFNEUNVIER",
+  "WACHTZEHNRS",
+  "BSECHSFMUHR",
+};
+
+static const ClockGridWord s_german_numbers[CLOCK_NUMBER_FORM_COUNT][12] = {
+  [CLOCK_NUMBER_FORM_DEFAULT] = {
+    { 5, 2, 4 },  // EINS
+    { 5, 0, 4 },  // ZWEI
+    { 6, 1, 4 },  // DREI
+    { 7, 7, 4 },  // VIER
+    { 6, 7, 4 },  // F\u00dcNF
+    { 9, 1, 5 },  // SECHS
+    { 5, 5, 6 },  // SIEBEN
+    { 8, 1, 4 },  // ACHT
+    { 7, 3, 4 },  // NEUN
+    { 8, 5, 4 },  // ZEHN
+    { 7, 0, 3 },  // ELF
+    { 4, 5, 6 },  // ZW\u00d6LF
+  },
+  [CLOCK_NUMBER_FORM_OCLOCK] = {
+    { 5, 2, 3 },  // EIN
+    { 5, 0, 4 },  // ZWEI
+    { 6, 1, 4 },  // DREI
+    { 7, 7, 4 },  // VIER
+    { 6, 7, 4 },  // F\u00dcNF
+    { 9, 1, 5 },  // SECHS
+    { 5, 5, 6 },  // SIEBEN
+    { 8, 1, 4 },  // ACHT
+    { 7, 3, 4 },  // NEUN
+    { 8, 5, 4 },  // ZEHN
+    { 7, 0, 3 },  // ELF
+    { 4, 5, 6 },  // ZW\u00d6LF
+  },
+};
+
+static const ClockGridWord
+    s_german_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 0, 7, 4 },  // F\u00dcNF
+  { 1, 0, 4 },  // ZEHN
+  { 1, 4, 7 },  // ZWANZIG
+  { 0, 0, 0 },  // Not used by German phrasing
+};
+
+static const ClockGridWord s_german_words[DE_WORD_COUNT] = {
+  { 0, 0, 2 },  // ES
+  { 0, 3, 3 },  // IST
+  { 9, 8, 3 },  // UHR
+  { 4, 0, 4 },  // HALB
+  { 2, 4, 7 },  // VIERTEL
+  { 3, 2, 4 },  // NACH
+  { 3, 6, 3 },  // VOR
 };
 
 // Matrix copied from the Italian QLOCKTWO front cover.  The apostrophe in
@@ -268,6 +342,39 @@ static const ClockMinuteRule s_english_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef EN_WORD
 
+#define DE_WORD(word) CLOCK_WORD_SET_BIT(DE_WORD_##word)
+static const ClockMinuteRule s_german_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(UHR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(NACH), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(NACH), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VIERTEL) | DE_WORD(NACH),
+    { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(NACH), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VOR) | DE_WORD(HALB),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(HALB), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(NACH) | DE_WORD(HALB),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VIERTEL) | DE_WORD(VOR),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DE_WORD(ES) | DE_WORD(IST) | DE_WORD(VOR), { 0, 0, 0 } },
+};
+#undef DE_WORD
+
 #define IT_WORD(word) CLOCK_WORD_SET_BIT(IT_WORD_##word)
 static const ClockMinuteRule s_italian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE, 0, { IT_WORD(SINGULAR_PREFIX), IT_WORD(SONO) | IT_WORD(LE) | IT_WORD(ORE), 0 } },
@@ -328,28 +435,43 @@ static const ClockHourOverride s_french_hour_overrides[] = {
 
 static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
   {
-    s_english_grid, s_english_numbers, s_english_minute_quantities,
-    s_english_words, EN_WORD_COUNT, s_english_minute_rules,
+    s_english_grid, { s_english_numbers, s_english_numbers },
+    s_english_minute_quantities,
+    s_english_words, EN_WORD_COUNT, 0, s_english_minute_rules,
     CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
   {
-    s_italian_grid, s_italian_numbers, s_italian_minute_quantities,
-    s_italian_words, IT_WORD_COUNT, s_italian_minute_rules,
+    s_italian_grid, { s_italian_numbers, s_italian_numbers },
+    s_italian_minute_quantities,
+    s_italian_words, IT_WORD_COUNT, 0, s_italian_minute_rules,
     CLOCK_HOUR_FORM_ONE,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
   {
-    s_french_grid, s_french_numbers, s_french_minute_quantities,
-    s_french_words, FR_WORD_COUNT, s_french_minute_rules,
+    s_french_grid, { s_french_numbers, s_french_numbers },
+    s_french_minute_quantities,
+    s_french_words, FR_WORD_COUNT, 0, s_french_minute_rules,
     CLOCK_HOUR_FORM_ONE,
     CLOCK_HOUR_FORM_OTHER, s_french_hour_overrides,
     sizeof(s_french_hour_overrides) / sizeof(s_french_hour_overrides[0]),
   },
   {
-    s_spanish_grid, s_spanish_numbers, s_spanish_minute_quantities,
-    s_spanish_words, ES_WORD_COUNT, s_spanish_minute_rules,
+    s_spanish_grid, { s_spanish_numbers, s_spanish_numbers },
+    s_spanish_minute_quantities,
+    s_spanish_words, ES_WORD_COUNT, 0, s_spanish_minute_rules,
     CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
+  {
+    s_german_grid,
+    {
+      s_german_numbers[CLOCK_NUMBER_FORM_DEFAULT],
+      s_german_numbers[CLOCK_NUMBER_FORM_OCLOCK],
+    },
+    s_german_minute_quantities, s_german_words, DE_WORD_COUNT,
+    CLOCK_WORD_SET_BIT(DE_WORD_UHR),
+    s_german_minute_rules, CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
 };
@@ -364,6 +486,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   if (value && strcmp(value, "es") == 0) {
     return CLOCK_LANGUAGE_ES;
   }
+  if (value && strcmp(value, "de") == 0) {
+    return CLOCK_LANGUAGE_DE;
+  }
   return CLOCK_LANGUAGE_EN;
 }
 
@@ -372,6 +497,34 @@ const ClockLanguageProfile *clock_language_get_profile(ClockLanguage language) {
     return &s_profiles[CLOCK_LANGUAGE_EN];
   }
   return &s_profiles[language];
+}
+
+bool clock_language_get_grid_letter(const ClockLanguageProfile *profile,
+                                    uint8_t row, uint8_t column,
+                                    char letter[5]) {
+  if (!profile || !letter || row >= CLOCK_GRID_ROWS ||
+      column >= CLOCK_GRID_COLUMNS) {
+    return false;
+  }
+
+  const char *character = profile->grid[row];
+  for (uint8_t index = 0; index < column; ++index) {
+    const uint8_t first_byte = (uint8_t)*character;
+    const uint8_t byte_count = first_byte < 0x80 ? 1
+                               : first_byte < 0xE0 ? 2
+                               : first_byte < 0xF0 ? 3
+                                                   : 4;
+    character += byte_count;
+  }
+
+  const uint8_t first_byte = (uint8_t)*character;
+  const uint8_t byte_count = first_byte < 0x80 ? 1
+                             : first_byte < 0xE0 ? 2
+                             : first_byte < 0xF0 ? 3
+                                                 : 4;
+  memcpy(letter, character, byte_count);
+  letter[byte_count] = '\0';
+  return true;
 }
 
 bool clock_language_get_hour_phrase(const ClockLanguageProfile *profile,
