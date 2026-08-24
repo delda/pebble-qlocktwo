@@ -272,7 +272,7 @@ static const ClockHourOverride s_french_hour_overrides[] = {
   { 12, 12, CLOCK_HOUR_FORM_SPECIAL, 0 },
 };
 
-static const ClockLanguageProfile s_profiles[] = {
+static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
   {
     s_english_grid, s_english_numbers, s_english_minute_quantities,
     s_english_words, s_english_minute_rules, CLOCK_HOUR_FORM_OTHER,
@@ -310,7 +310,7 @@ ClockLanguage clock_language_from_string(const char *value) {
 }
 
 const ClockLanguageProfile *clock_language_get_profile(ClockLanguage language) {
-  if (language > CLOCK_LANGUAGE_ES) {
+  if (language >= CLOCK_LANGUAGE_COUNT) {
     return &s_profiles[CLOCK_LANGUAGE_EN];
   }
   return &s_profiles[language];

@@ -185,7 +185,7 @@ static void prv_init(void) {
   if (persist_exists(PERSIST_KEY_CLOCK_LANGUAGE)) {
     const int stored_language = persist_read_int(PERSIST_KEY_CLOCK_LANGUAGE);
     if (stored_language >= CLOCK_LANGUAGE_EN &&
-        stored_language <= CLOCK_LANGUAGE_ES) {
+        stored_language < CLOCK_LANGUAGE_COUNT) {
       s_clock_language = stored_language;
       s_clock_profile = clock_language_get_profile(s_clock_language);
       s_letter_grid = s_clock_profile->grid;
