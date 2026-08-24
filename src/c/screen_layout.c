@@ -2,6 +2,7 @@
 
 #define DOT_REFERENCE_DISPLAY_HEIGHT 168
 #define DOT_REFERENCE_BOTTOM_OFFSET 5
+#define MINUTE_DOT_COUNT 4
 #define DOT_RADIUS 2
 #define GRID_REFERENCE_DISPLAY_HEIGHT 228
 #define GRID_REFERENCE_VERTICAL_OFFSET 9
@@ -22,6 +23,7 @@ ScreenLayout screen_layout_create(GRect bounds, uint8_t columns, uint8_t rows,
                                   GFont letter_font) {
   ScreenLayout layout = {
     .bounds = bounds,
+    .columns = columns,
     .cell_width = bounds.size.w / columns,
     .cell_height = bounds.size.h / rows,
     .minute_dot_y = bounds.size.h - prv_scale_from_reference_height(
@@ -46,16 +48,20 @@ GRect screen_layout_cell_rect(const ScreenLayout *layout, uint8_t row,
 
 void screen_layout_draw_minute_dots(GContext *ctx, const ScreenLayout *layout,
                                     uint8_t count, GColor color) {
-  // The dots sit between S/E, E/O, O/C, and C/L in "TENSEOCLOCK".
-  static const uint8_t s_dot_boundaries[] = { 4, 5, 6, 7 };
-  const uint8_t dot_count = count > ARRAY_LENGTH(s_dot_boundaries)
-                                ? ARRAY_LENGTH(s_dot_boundaries)
-                                : count;
+  if (layout->columns < MINUTE_DOT_COUNT) {
+    return;
+  }
+
+  const uint8_t dot_count = count > MINUTE_DOT_COUNT ? MINUTE_DOT_COUNT
+                                                       : count;
+  const uint8_t first_dot_boundary =
+      (layout->columns - MINUTE_DOT_COUNT + 1) / 2;
 
   graphics_context_set_fill_color(ctx, color);
   for (uint8_t index = 0; index < dot_count; ++index) {
     graphics_fill_circle(ctx,
-                         GPoint(s_dot_boundaries[index] * layout->cell_width,
+                         GPoint((first_dot_boundary + index) *
+                                    layout->cell_width,
                                 layout->minute_dot_y),
                          DOT_RADIUS);
   }

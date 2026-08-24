@@ -4,6 +4,7 @@
 
 typedef struct {
   GRect bounds;
+  uint8_t columns;
   int16_t cell_width;
   int16_t cell_height;
   int16_t minute_dot_y;
