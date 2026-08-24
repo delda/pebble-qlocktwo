@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define CLOCK_GRID_COLUMNS 11
 #define CLOCK_GRID_ROWS 10
 #define CLOCK_MINUTE_RULE_COUNT 12
 

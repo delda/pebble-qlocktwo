@@ -4,8 +4,6 @@
 #include "color_theme.h"
 #include "screen_layout.h"
 
-#define GRID_COLUMNS 11
-#define GRID_ROWS CLOCK_GRID_ROWS
 #define PERSIST_KEY_COLOR_THEME 1
 #define PERSIST_KEY_CLOCK_LANGUAGE 2
 
@@ -118,17 +116,19 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
 
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   const ScreenLayout layout = screen_layout_create(layer_get_bounds(layer),
-                                                    GRID_COLUMNS, GRID_ROWS,
+                                                    CLOCK_GRID_COLUMNS,
+                                                    CLOCK_GRID_ROWS,
                                                     s_letter_font);
   const ColorTheme *theme = color_theme_get(s_color_theme);
 
   graphics_context_set_fill_color(ctx, theme->background);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 
-  for (int row = 0; row < GRID_ROWS; ++row) {
-    for (int column = 0; column < GRID_COLUMNS; ++column) {
+  for (int row = 0; row < CLOCK_GRID_ROWS; ++row) {
+    for (int column = 0; column < CLOCK_GRID_COLUMNS; ++column) {
       const GRect cell = screen_layout_cell_rect(&layout, row, column,
-                                                 GRID_COLUMNS, GRID_ROWS);
+                                                 CLOCK_GRID_COLUMNS,
+                                                 CLOCK_GRID_ROWS);
       const char letter[] = { s_letter_grid[row][column], '\0' };
       const bool is_active = prv_is_phrase_letter(row, column);
 
