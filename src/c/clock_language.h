@@ -21,24 +21,11 @@ typedef struct {
   uint8_t length;
 } ClockGridWord;
 
-typedef enum {
-  CLOCK_WORD_IT,
-  CLOCK_WORD_IS,
-  CLOCK_WORD_A,
-  CLOCK_WORD_OCLOCK,
-  CLOCK_WORD_HALF,
-  CLOCK_WORD_QUARTER,
-  CLOCK_WORD_PAST,
-  CLOCK_WORD_TO,
-  CLOCK_WORD_QUARTER_ARTICLE,
-  CLOCK_WORD_SINGULAR_PREFIX,
-  CLOCK_WORD_HOUR_SPECIAL,
-  CLOCK_WORD_COUNT,
-} ClockWord;
+#define CLOCK_WORD_SET_MAX 32
 
-typedef uint16_t ClockWordSet;
+typedef uint32_t ClockWordSet;
 
-#define CLOCK_WORD_BIT(word) ((ClockWordSet)1u << (word))
+#define CLOCK_WORD_SET_BIT(index) ((ClockWordSet)1u << (index))
 
 typedef enum {
   CLOCK_HOUR_FORM_ONE,
@@ -79,6 +66,7 @@ typedef struct {
   const ClockGridWord *numbers;
   const ClockGridWord *minute_quantities;
   const ClockGridWord *words;
+  uint8_t word_count;
   const ClockMinuteRule *minute_rules;
   ClockHourForm form_for_one;
   ClockHourForm form_for_other;

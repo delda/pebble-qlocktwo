@@ -74,8 +74,8 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
 
   const ClockWordSet active_words =
       rule->words | rule->hour_form_words[hour_form] | hour_words;
-  for (ClockWord word = 0; word < CLOCK_WORD_COUNT; ++word) {
-    if ((active_words & CLOCK_WORD_BIT(word)) &&
+  for (uint8_t word = 0; word < s_clock_profile->word_count; ++word) {
+    if ((active_words & CLOCK_WORD_SET_BIT(word)) &&
         prv_is_grid_word_letter(&s_clock_profile->words[word], row, column)) {
       return true;
     }
