@@ -30,7 +30,8 @@ static const ClockGridWord s_english_numbers[12] = {
   { 8, 5, 6 },  // TWELVE
 };
 
-static const ClockGridWord s_english_minute_quantities[] = {
+static const ClockGridWord
+    s_english_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
   { 2, 6, 4 },   // FIVE
   { 3, 5, 3 },   // TEN
   { 2, 0, 6 },   // TWENTY
@@ -81,7 +82,8 @@ static const ClockGridWord s_italian_numbers[12] = {
   { 4, 0, 6 },  // DODICI
 };
 
-static const ClockGridWord s_italian_minute_quantities[] = {
+static const ClockGridWord
+    s_italian_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
   { 6, 0, 6 },   // CINQUE
   { 9, 0, 5 },   // DIECI
   { 8, 0, 5 },   // VENTI
@@ -132,7 +134,8 @@ static const ClockGridWord s_french_numbers[12] = {
   { 4, 0, 4 },  // MIDI
 };
 
-static const ClockGridWord s_french_minute_quantities[] = {
+static const ClockGridWord
+    s_french_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
   { 8, 6, 4 },   // CINQ
   { 6, 8, 3 },   // DIX
   { 8, 0, 5 },   // VINGT
@@ -182,7 +185,8 @@ static const ClockGridWord s_spanish_numbers[12] = {
   { 6, 0, 4 },  // DOCE
 };
 
-static const ClockGridWord s_spanish_minute_quantities[] = {
+static const ClockGridWord
+    s_spanish_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
   { 2, 6, 5 },  // CINCO
   { 7, 7, 4 },  // DIEZ
   { 7, 1, 6 },  // VEINTE
@@ -208,63 +212,63 @@ static const ClockGridWord s_spanish_words[CLOCK_WORD_COUNT] = {
 // Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
 // describes the order of the words and which hour is being named.
 static const ClockMinuteRule s_english_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
-  { 0, 0, W(IT) | W(IS) | W(OCLOCK), { 0, 0, 0 } },
-  { 0, 5, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
-  { 0, 10, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
-  { 0, 0, W(IT) | W(IS) | W(A) | W(QUARTER) | W(PAST), { 0, 0, 0 } },
-  { 0, 20, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
-  { 0, 25, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
-  { 0, 0, W(IT) | W(IS) | W(HALF) | W(PAST), { 0, 0, 0 } },
-  { 1, 25, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
-  { 1, 20, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
-  { 1, 0, W(IT) | W(IS) | W(A) | W(QUARTER) | W(TO), { 0, 0, 0 } },
-  { 1, 10, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
-  { 1, 5, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(OCLOCK), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(A) | W(QUARTER) | W(PAST), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(HALF) | W(PAST), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(A) | W(QUARTER) | W(TO), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
 };
 
 static const ClockMinuteRule s_italian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
-  { 0, 0, 0, { W(SINGULAR_PREFIX), W(IT) | W(IS) | W(OCLOCK), 0 } },
-  { 0, 5, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 0, 10, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 0, 0, W(QUARTER_ARTICLE) | W(QUARTER) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 0, 20, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 0, 25, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 0, 0, W(HALF) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 1, 25, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 1, 20, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 1, 0, W(QUARTER_ARTICLE) | W(QUARTER) | W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 1, 10, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
-  { 1, 5, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, 0, { W(SINGULAR_PREFIX), W(IT) | W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(QUARTER_ARTICLE) | W(QUARTER) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(HALF) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, W(QUARTER_ARTICLE) | W(QUARTER) | W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
 };
 
 static const ClockMinuteRule s_french_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
-  { 0, 0, W(IT) | W(IS), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 5, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 10, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 0, W(IT) | W(IS) | W(QUARTER) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 20, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 25, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 0, 0, W(IT) | W(IS) | W(HALF) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 1, 25, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 1, 20, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 1, 0, W(IT) | W(IS) | W(QUARTER) | W(TO) | W(A), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 1, 10, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
-  { 1, 5, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(QUARTER) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(HALF) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, W(IT) | W(IS) | W(QUARTER) | W(TO) | W(A), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
 };
 
 static const ClockMinuteRule s_spanish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
-  { 0, 0, 0, { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 5, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 10, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 0, W(QUARTER) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 20, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 25, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 0, 0, W(HALF) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 1, 25, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 1, 20, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 1, 0, W(QUARTER) | W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 1, 10, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
-  { 1, 5, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, 0, { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(QUARTER) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, W(HALF) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY_FIVE, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, W(QUARTER) | W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
 };
 
 static const ClockHourOverride s_french_hour_overrides[] = {

@@ -87,29 +87,13 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
     return true;
   }
 
-  if (!rule->minute_quantity) {
+  if (rule->minute_quantity == CLOCK_MINUTE_QUANTITY_NONE) {
     return false;
   }
 
-  uint8_t quantity_index;
-  switch (rule->minute_quantity) {
-    case 5:
-      quantity_index = 0;
-      break;
-    case 10:
-      quantity_index = 1;
-      break;
-    case 20:
-      quantity_index = 2;
-      break;
-    case 25:
-      quantity_index = 3;
-      break;
-    default:
-      return false;
-  }
   return prv_is_grid_word_letter(
-      &s_clock_profile->minute_quantities[quantity_index], row, column);
+      &s_clock_profile->minute_quantities[rule->minute_quantity - 1], row,
+      column);
 }
 
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {

@@ -47,11 +47,20 @@ typedef enum {
   CLOCK_HOUR_FORM_COUNT,
 } ClockHourForm;
 
+typedef enum {
+  CLOCK_MINUTE_QUANTITY_NONE,
+  CLOCK_MINUTE_QUANTITY_FIVE,
+  CLOCK_MINUTE_QUANTITY_TEN,
+  CLOCK_MINUTE_QUANTITY_TWENTY,
+  CLOCK_MINUTE_QUANTITY_TWENTY_FIVE,
+  CLOCK_MINUTE_QUANTITY_COUNT,
+} ClockMinuteQuantity;
+
 // A declarative phrase for one five-minute interval.  The active words are
 // the union of `words` and the words selected for the displayed hour form.
 typedef struct {
   int8_t hour_offset;
-  uint8_t minute_quantity;
+  ClockMinuteQuantity minute_quantity;
   ClockWordSet words;
   ClockWordSet hour_form_words[CLOCK_HOUR_FORM_COUNT];
 } ClockMinuteRule;
