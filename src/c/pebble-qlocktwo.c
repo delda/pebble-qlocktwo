@@ -14,7 +14,6 @@ static ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const ClockLanguageProfile *s_clock_profile;
 static const char *const *s_letter_grid;
 static uint8_t s_hours;
-static uint8_t s_seconds;
 static uint8_t s_minutes_rounded_to_five;
 static uint8_t s_minutes_modulo_five;
 static ColorThemeId s_color_theme = COLOR_THEME_BLACK;
@@ -42,7 +41,6 @@ static void prv_inbox_received_handler(DictionaryIterator *iterator,
 
 static void prv_update_time(struct tm *tick_time) {
   s_hours = tick_time->tm_hour;
-  s_seconds = tick_time->tm_sec;
   s_minutes_rounded_to_five = (tick_time->tm_min / 5) * 5;
   s_minutes_modulo_five = tick_time->tm_min % 5;
 
@@ -207,7 +205,7 @@ static void prv_init(void) {
 
   time_t now = time(NULL);
   prv_update_time(localtime(&now));
-  tick_timer_service_subscribe(SECOND_UNIT, prv_tick_handler);
+  tick_timer_service_subscribe(MINUTE_UNIT, prv_tick_handler);
 }
 
 static void prv_deinit(void) {
