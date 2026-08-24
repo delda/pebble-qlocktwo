@@ -48,6 +48,7 @@ static const ClockGridWord s_english_words[CLOCK_WORD_COUNT] = {
   { 3, 9, 2 },  // TO
   { 1, 0, 1 },  // A
   { 0, 0, 2 },  // IT
+  { 0, 0, 0 },  // Not used
 };
 
 // Matrix copied from the Italian QLOCKTWO front cover.  The apostrophe in
@@ -98,6 +99,7 @@ static const ClockGridWord s_italian_words[CLOCK_WORD_COUNT] = {
   { 6, 7, 4 },  // MENO
   { 7, 2, 2 },  // UN
   { 1, 0, 1 },  // E (for e' l'una)
+  { 0, 0, 0 },  // Not used
 };
 
 // Matrix copied from the French QLOCKTWO front cover. The hyphen separates
@@ -148,6 +150,7 @@ static const ClockGridWord s_french_words[CLOCK_WORD_COUNT] = {
   { 6, 0, 5 },  // MOINS
   { 6, 6, 2 },  // LE
   { 5, 5, 5 },  // HEURE
+  { 4, 5, 6 },  // MINUIT
 };
 
 // Matrix copied from the Spanish QLOCKTWO front cover.
@@ -197,6 +200,100 @@ static const ClockGridWord s_spanish_words[CLOCK_WORD_COUNT] = {
   { 6, 6, 5 },  // MENOS
   { 0, 5, 2 },  // LA
   { 0, 5, 2 },  // LA
+  { 0, 0, 0 },  // Not used
+};
+
+#define W(word) CLOCK_WORD_BIT(CLOCK_WORD_##word)
+
+// Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
+// describes the order of the words and which hour is being named.
+static const ClockMinuteRule s_english_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, 0, W(IT) | W(IS) | W(OCLOCK), { 0, 0, 0 } },
+  { 0, 5, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, 10, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, 0, W(IT) | W(IS) | W(A) | W(QUARTER) | W(PAST), { 0, 0, 0 } },
+  { 0, 20, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, 25, W(IT) | W(IS) | W(PAST), { 0, 0, 0 } },
+  { 0, 0, W(IT) | W(IS) | W(HALF) | W(PAST), { 0, 0, 0 } },
+  { 1, 25, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, 20, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, 0, W(IT) | W(IS) | W(A) | W(QUARTER) | W(TO), { 0, 0, 0 } },
+  { 1, 10, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+  { 1, 5, W(IT) | W(IS) | W(TO), { 0, 0, 0 } },
+};
+
+static const ClockMinuteRule s_italian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, 0, 0, { W(SINGULAR_PREFIX), W(IT) | W(IS) | W(OCLOCK), 0 } },
+  { 0, 5, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, 10, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, 0, W(QUARTER_ARTICLE) | W(QUARTER) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, 20, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, 25, W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 0, 0, W(HALF) | W(PAST), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, 25, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, 20, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, 0, W(QUARTER_ARTICLE) | W(QUARTER) | W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, 10, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+  { 1, 5, W(TO), { W(SINGULAR_PREFIX), W(IT) | W(IS), 0 } },
+};
+
+static const ClockMinuteRule s_french_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, 0, W(IT) | W(IS), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 5, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 10, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 0, W(IT) | W(IS) | W(QUARTER) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 20, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 25, W(IT) | W(IS) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 0, 0, W(IT) | W(IS) | W(HALF) | W(PAST), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, 25, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, 20, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, 0, W(IT) | W(IS) | W(QUARTER) | W(TO) | W(A), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, 10, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+  { 1, 5, W(IT) | W(IS) | W(TO), { W(A) | W(SINGULAR_PREFIX), W(OCLOCK), 0 } },
+};
+
+static const ClockMinuteRule s_spanish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, 0, 0, { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 5, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 10, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 0, W(QUARTER) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 20, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 25, W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 0, 0, W(HALF) | W(PAST), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, 25, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, 20, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, 0, W(QUARTER) | W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, 10, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+  { 1, 5, W(TO), { W(IT) | W(A), W(IS) | W(OCLOCK), 0 } },
+};
+
+static const ClockHourOverride s_french_hour_overrides[] = {
+  { 0, 0, CLOCK_HOUR_FORM_SPECIAL, W(HOUR_SPECIAL) },
+  { 12, 12, CLOCK_HOUR_FORM_SPECIAL, 0 },
+};
+
+static const ClockLanguageProfile s_profiles[] = {
+  {
+    s_english_grid, s_english_numbers, s_english_minute_quantities,
+    s_english_words, s_english_minute_rules, CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
+  {
+    s_italian_grid, s_italian_numbers, s_italian_minute_quantities,
+    s_italian_words, s_italian_minute_rules, CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
+  {
+    s_french_grid, s_french_numbers, s_french_minute_quantities,
+    s_french_words, s_french_minute_rules, CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, s_french_hour_overrides,
+    sizeof(s_french_hour_overrides) / sizeof(s_french_hour_overrides[0]),
+  },
+  {
+    s_spanish_grid, s_spanish_numbers, s_spanish_minute_quantities,
+    s_spanish_words, s_spanish_minute_rules, CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -212,144 +309,37 @@ ClockLanguage clock_language_from_string(const char *value) {
   return CLOCK_LANGUAGE_EN;
 }
 
-const char *const *clock_language_get_grid(ClockLanguage language) {
-  switch (language) {
-    case CLOCK_LANGUAGE_EN:
-    default:
-      return s_english_grid;
-    case CLOCK_LANGUAGE_IT:
-      return s_italian_grid;
-    case CLOCK_LANGUAGE_FR:
-      return s_french_grid;
-    case CLOCK_LANGUAGE_ES:
-      return s_spanish_grid;
+const ClockLanguageProfile *clock_language_get_profile(ClockLanguage language) {
+  if (language > CLOCK_LANGUAGE_ES) {
+    return &s_profiles[CLOCK_LANGUAGE_EN];
   }
+  return &s_profiles[language];
 }
 
-bool clock_language_get_number(ClockLanguage language, uint8_t number,
-                               ClockGridWord *word) {
-  if (number < 1 || number > 12 || !word) {
+bool clock_language_get_hour_phrase(const ClockLanguageProfile *profile,
+                                    uint8_t hour, uint8_t *number,
+                                    ClockHourForm *form,
+                                    ClockWordSet *words) {
+  if (!profile || !number || !form || !words) {
     return false;
   }
 
-  switch (language) {
-    case CLOCK_LANGUAGE_EN:
-      *word = s_english_numbers[number - 1];
-      return true;
-    case CLOCK_LANGUAGE_IT:
-      *word = s_italian_numbers[number - 1];
-      return true;
-    case CLOCK_LANGUAGE_FR:
-      *word = s_french_numbers[number - 1];
-      return true;
-    case CLOCK_LANGUAGE_ES:
-      *word = s_spanish_numbers[number - 1];
-      return true;
-    default:
-      return false;
+  const uint8_t normalized_hour = hour % 24;
+  *number = normalized_hour % 12;
+  if (*number == 0) {
+    *number = 12;
   }
-}
+  *form = *number == 1 ? profile->form_for_one : profile->form_for_other;
+  *words = 0;
 
-bool clock_language_get_minute_quantity(ClockLanguage language, uint8_t minutes,
-                                        ClockGridWord *word) {
-  if (!word) {
-    return false;
+  for (uint8_t index = 0; index < profile->hour_override_count; ++index) {
+    const ClockHourOverride *override = &profile->hour_overrides[index];
+    if (override->hour == normalized_hour) {
+      *number = override->number;
+      *form = override->form;
+      *words = override->words;
+      break;
+    }
   }
-
-  switch (language) {
-    case CLOCK_LANGUAGE_EN:
-      switch (minutes) {
-        case 5:
-          *word = s_english_minute_quantities[0];
-          return true;
-        case 10:
-          *word = s_english_minute_quantities[1];
-          return true;
-        case 20:
-          *word = s_english_minute_quantities[2];
-          return true;
-        case 25:
-          *word = s_english_minute_quantities[3];
-          return true;
-        default:
-          return false;
-      }
-    case CLOCK_LANGUAGE_IT:
-      switch (minutes) {
-        case 5:
-          *word = s_italian_minute_quantities[0];
-          return true;
-        case 10:
-          *word = s_italian_minute_quantities[1];
-          return true;
-        case 20:
-          *word = s_italian_minute_quantities[2];
-          return true;
-        case 25:
-          *word = s_italian_minute_quantities[3];
-          return true;
-        default:
-          return false;
-      }
-    case CLOCK_LANGUAGE_FR:
-      switch (minutes) {
-        case 5:
-          *word = s_french_minute_quantities[0];
-          return true;
-        case 10:
-          *word = s_french_minute_quantities[1];
-          return true;
-        case 20:
-          *word = s_french_minute_quantities[2];
-          return true;
-        case 25:
-          *word = s_french_minute_quantities[3];
-          return true;
-        default:
-          return false;
-      }
-    case CLOCK_LANGUAGE_ES:
-      switch (minutes) {
-        case 5:
-          *word = s_spanish_minute_quantities[0];
-          return true;
-        case 10:
-          *word = s_spanish_minute_quantities[1];
-          return true;
-        case 20:
-          *word = s_spanish_minute_quantities[2];
-          return true;
-        case 25:
-          *word = s_spanish_minute_quantities[3];
-          return true;
-        default:
-          return false;
-      }
-    default:
-      return false;
-  }
-}
-
-bool clock_language_get_word(ClockLanguage language, ClockWord requested_word,
-                             ClockGridWord *word) {
-  if (!word || requested_word >= CLOCK_WORD_COUNT) {
-    return false;
-  }
-
-  switch (language) {
-    case CLOCK_LANGUAGE_EN:
-      *word = s_english_words[requested_word];
-      return true;
-    case CLOCK_LANGUAGE_IT:
-      *word = s_italian_words[requested_word];
-      return true;
-    case CLOCK_LANGUAGE_FR:
-      *word = s_french_words[requested_word];
-      return true;
-    case CLOCK_LANGUAGE_ES:
-      *word = s_spanish_words[requested_word];
-      return true;
-    default:
-      return false;
-  }
+  return true;
 }
