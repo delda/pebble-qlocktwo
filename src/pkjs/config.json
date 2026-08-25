@@ -31,6 +31,10 @@
           {
             "label": "Deutsch",
             "value": "de"
+          },
+          {
+            "label": "Nederlands",
+            "value": "nl"
           }
         ]
       },

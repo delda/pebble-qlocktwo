@@ -64,6 +64,17 @@ typedef enum {
   ES_WORD_COUNT,
 } SpanishWord;
 
+typedef enum {
+  NL_WORD_HET,
+  NL_WORD_IS,
+  NL_WORD_UUR,
+  NL_WORD_HALF,
+  NL_WORD_KWART,
+  NL_WORD_OVER,
+  NL_WORD_VOOR,
+  NL_WORD_COUNT,
+} DutchWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -323,6 +334,53 @@ static const ClockGridWord s_spanish_words[ES_WORD_COUNT] = {
   { 6, 6, 5 },  // MENOS
 };
 
+// Matrix copied from the standard Dutch QLOCKTWO front cover.
+static const char *const s_dutch_grid[CLOCK_GRID_ROWS] = {
+  "HETKISAVIJF",
+  "TIENATZVOOR",
+  "OVERMEKWART",
+  "HALFSPMOVER",
+  "VOORTHGEENS",
+  "TWEEAMCDRIE",
+  "VIERVIJFZES",
+  "ZEVENONEGEN",
+  "ACHTTIENELF",
+  "TWAALFPMUUR",
+};
+
+static const ClockGridWord s_dutch_numbers[12] = {
+  { 4, 7, 3 },  // EEN
+  { 5, 0, 4 },  // TWEE
+  { 5, 7, 4 },  // DRIE
+  { 6, 0, 4 },  // VIER
+  { 6, 4, 4 },  // VIJF
+  { 6, 8, 3 },  // ZES
+  { 7, 0, 5 },  // ZEVEN
+  { 8, 0, 4 },  // ACHT
+  { 7, 6, 5 },  // NEGEN
+  { 8, 4, 4 },  // TIEN
+  { 8, 8, 3 },  // ELF
+  { 9, 0, 6 },  // TWAALF
+};
+
+static const ClockGridWord
+    s_dutch_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 0, 7, 4 },  // VIJF
+  { 1, 0, 4 },  // TIEN
+  { 0, 0, 0 },  // Not used by Dutch phrasing
+  { 0, 0, 0 },  // Not used by Dutch phrasing
+};
+
+static const ClockGridWord s_dutch_words[NL_WORD_COUNT] = {
+  { 0, 0, 3 },  // HET
+  { 0, 4, 2 },  // IS
+  { 9, 8, 3 },  // UUR
+  { 3, 0, 4 },  // HALF
+  { 2, 6, 5 },  // KWART
+  { 3, 7, 4 },  // OVER
+  { 1, 7, 4 },  // VOOR
+};
+
 // Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
 // describes the order of the words and which hour is being named.
 #define EN_WORD(word) CLOCK_WORD_SET_BIT(EN_WORD_##word)
@@ -426,6 +484,41 @@ static const ClockMinuteRule s_spanish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef ES_WORD
 
+#define NL_WORD(word) CLOCK_WORD_SET_BIT(NL_WORD_##word)
+static const ClockMinuteRule s_dutch_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(UUR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(OVER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(OVER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(KWART) | NL_WORD(OVER),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(VOOR) | NL_WORD(HALF),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(VOOR) | NL_WORD(HALF),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(HALF), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(OVER) | NL_WORD(HALF),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(OVER) | NL_WORD(HALF),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(KWART) | NL_WORD(VOOR),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(VOOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    NL_WORD(HET) | NL_WORD(IS) | NL_WORD(VOOR), { 0, 0, 0 } },
+};
+#undef NL_WORD
+
 #define FR_WORD(word) CLOCK_WORD_SET_BIT(FR_WORD_##word)
 static const ClockHourOverride s_french_hour_overrides[] = {
   { 0, 0, CLOCK_HOUR_FORM_SPECIAL, FR_WORD(MINUIT) },
@@ -474,6 +567,13 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     s_german_minute_rules, CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_dutch_grid, { s_dutch_numbers, s_dutch_numbers },
+    s_dutch_minute_quantities,
+    s_dutch_words, NL_WORD_COUNT, 0, s_dutch_minute_rules,
+    CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -488,6 +588,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "de") == 0) {
     return CLOCK_LANGUAGE_DE;
+  }
+  if (value && strcmp(value, "nl") == 0) {
+    return CLOCK_LANGUAGE_NL;
   }
   return CLOCK_LANGUAGE_EN;
 }
