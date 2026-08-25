@@ -75,6 +75,22 @@ typedef enum {
   NL_WORD_COUNT,
 } DutchWord;
 
+typedef enum {
+  PT_WORD_E,
+  PT_WORD_E_SINGULAR,
+  PT_WORD_SAO,
+  PT_WORD_HORA,
+  PT_WORD_HORAS,
+  PT_WORD_MEIA,
+  PT_WORD_MENOS,
+  PT_WORD_UM,
+  PT_WORD_QUARTO,
+  PT_WORD_MEIO_DIA,
+  PT_WORD_NOITE,
+  PT_WORD_CINCO,
+  PT_WORD_COUNT,
+} PortugueseWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -381,6 +397,58 @@ static const ClockGridWord s_dutch_words[NL_WORD_COUNT] = {
   { 1, 7, 4 },  // VOOR
 };
 
+// Matrix copied from the standard Portuguese QLOCKTWO front cover.
+static const char *const s_portuguese_grid[CLOCK_GRID_ROWS] = {
+  "\u00c9S\u00c3OUMATR\u00caS",
+  "MEIODIADEZ",
+  "DUASEISETEY",
+  "QUATROHNOVE",
+  "CINCOITONZE",
+  "ZMEIALNOITE",
+  "HORASYMENOS",
+  "VINTECAMEIA",
+  "UMVQUARTOPM",
+  "DEZOEYCINCO",
+};
+
+static const ClockGridWord s_portuguese_numbers[12] = {
+  { 0, 4, 3 },  // UMA
+  { 2, 0, 4 },  // DUAS
+  { 0, 7, 4 },  // TR\u00caS
+  { 3, 0, 6 },  // QUATRO
+  { 4, 0, 5 },  // CINCO
+  { 2, 3, 4 },  // SEIS
+  { 2, 7, 4 },  // SETE
+  { 4, 4, 4 },  // OITO
+  { 3, 7, 4 },  // NOVE
+  { 9, 0, 3 },  // DEZ
+  { 4, 7, 4 },  // ONZE
+  { 0, 0, 0 },  // MEIO-DIA / MEIA-NOITE
+};
+
+static const ClockGridWord
+    s_portuguese_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 9, 6, 5 },  // CINCO
+  { 9, 0, 3 },  // DEZ
+  { 7, 0, 5 },  // VINTE
+  { 0, 0, 0 },  // Expressed as VINTE E CINCO
+};
+
+static const ClockGridWord s_portuguese_words[PT_WORD_COUNT] = {
+  { 9, 4, 1 },  // E
+  { 0, 0, 1 },  // \u00c9
+  { 0, 1, 3 },  // S\u00c3O
+  { 6, 0, 4 },  // HORA
+  { 6, 0, 5 },  // HORAS
+  { 5, 1, 4 },  // MEIA
+  { 6, 6, 5 },  // MENOS
+  { 8, 0, 2 },  // UM
+  { 8, 3, 6 },  // QUARTO
+  { 1, 0, 7 },  // MEIODIA
+  { 5, 6, 5 },  // NOITE
+  { 9, 6, 5 },  // CINCO
+};
+
 // Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
 // describes the order of the words and which hour is being named.
 #define EN_WORD(word) CLOCK_WORD_SET_BIT(EN_WORD_##word)
@@ -519,6 +587,42 @@ static const ClockMinuteRule s_dutch_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef NL_WORD
 
+#define PT_WORD(word) CLOCK_WORD_SET_BIT(PT_WORD_##word)
+static const ClockMinuteRule
+    s_portuguese_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, 0,
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, PT_WORD(E),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, PT_WORD(E),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, PT_WORD(E) | PT_WORD(UM) | PT_WORD(QUARTO),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, PT_WORD(E),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, PT_WORD(E) | PT_WORD(CINCO),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, PT_WORD(E) | PT_WORD(MEIA),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, PT_WORD(MENOS) | PT_WORD(CINCO),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, PT_WORD(MENOS),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, PT_WORD(MENOS) | PT_WORD(UM) | PT_WORD(QUARTO),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, PT_WORD(MENOS),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, PT_WORD(MENOS),
+    { PT_WORD(E_SINGULAR) | PT_WORD(HORA), PT_WORD(SAO) | PT_WORD(HORAS), 0 } },
+};
+
+static const ClockHourOverride s_portuguese_hour_overrides[] = {
+  { 0, 0, CLOCK_HOUR_FORM_SPECIAL,
+    PT_WORD(E_SINGULAR) | PT_WORD(MEIA) | PT_WORD(NOITE) },
+  { 12, 0, CLOCK_HOUR_FORM_SPECIAL, PT_WORD(E_SINGULAR) | PT_WORD(MEIO_DIA) },
+};
+#undef PT_WORD
+
 #define FR_WORD(word) CLOCK_WORD_SET_BIT(FR_WORD_##word)
 static const ClockHourOverride s_french_hour_overrides[] = {
   { 0, 0, CLOCK_HOUR_FORM_SPECIAL, FR_WORD(MINUIT) },
@@ -574,6 +678,14 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_portuguese_grid, { s_portuguese_numbers, s_portuguese_numbers },
+    s_portuguese_minute_quantities,
+    s_portuguese_words, PT_WORD_COUNT, 0, s_portuguese_minute_rules,
+    CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, s_portuguese_hour_overrides,
+    sizeof(s_portuguese_hour_overrides) / sizeof(s_portuguese_hour_overrides[0]),
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -591,6 +703,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "nl") == 0) {
     return CLOCK_LANGUAGE_NL;
+  }
+  if (value && strcmp(value, "pt") == 0) {
+    return CLOCK_LANGUAGE_PT;
   }
   return CLOCK_LANGUAGE_EN;
 }
