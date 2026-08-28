@@ -16,7 +16,7 @@ The four dots at the bottom of the display indicate the remaining minutes. For
 example, at 10:07 the watchface shows `IT IS FIVE PAST TEN` and two dots.
 
 The grid and time phrases are available in English, Italian, French, Spanish,
-German, Dutch, Portuguese, and Swedish.
+German, Dutch, Portuguese, Swedish, and Danish.
 
 ## Customisation
 

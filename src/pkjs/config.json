@@ -43,6 +43,10 @@
           {
             "label": "Svenska",
             "value": "se"
+          },
+          {
+            "label": "Dansk",
+            "value": "dk"
           }
         ]
       },

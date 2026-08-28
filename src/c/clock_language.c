@@ -101,6 +101,18 @@ typedef enum {
   SE_WORD_COUNT,
 } SwedishWord;
 
+typedef enum {
+  DK_WORD_KLOKKEN,
+  DK_WORD_ER,
+  DK_WORD_KVART,
+  DK_WORD_MINUTTER,
+  DK_WORD_OVER,
+  DK_WORD_I,
+  DK_WORD_HALV,
+  DK_WORD_ET,
+  DK_WORD_COUNT,
+} DanishWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -505,6 +517,36 @@ static const ClockGridWord s_swedish_words[SE_WORD_COUNT] = {
   { 4, 7, 4 },  // HALV
 };
 
+// Matrix copied from the standard Danish QLOCKTWO front cover.
+static const char *const s_danish_grid[CLOCK_GRID_ROWS] = {
+  "KLOKKENVERO",
+  "FEMTYVESKAM",
+  "OJEKVARTVAT",
+  "TIAMINUTTER",
+  "FEMOVERILPM",
+  "MONALISHALV",
+  "ETTOTREFIRE",
+  "FEMSEKSRSYV",
+  "OTTERNIMETI",
+  "ELLEVEATOLV",
+};
+
+static const ClockGridWord s_danish_numbers[12] = {
+  { 6, 0, 2 }, { 6, 2, 2 }, { 6, 4, 3 }, { 6, 7, 4 },
+  { 7, 0, 3 }, { 7, 3, 4 }, { 7, 8, 3 }, { 8, 0, 4 },
+  { 8, 5, 2 }, { 8, 9, 2 }, { 9, 0, 6 }, { 9, 7, 4 },
+};
+
+static const ClockGridWord
+    s_danish_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 1, 0, 3 }, { 3, 0, 2 }, { 1, 3, 4 }, { 0, 0, 0 },
+};
+
+static const ClockGridWord s_danish_words[DK_WORD_COUNT] = {
+  { 0, 0, 7 }, { 0, 8, 2 }, { 2, 3, 5 }, { 3, 3, 8 },
+  { 4, 3, 4 }, { 4, 8, 1 }, { 5, 7, 4 }, { 6, 0, 2 },
+};
+
 // Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
 // describes the order of the words and which hour is being named.
 #define EN_WORD(word) CLOCK_WORD_SET_BIT(EN_WORD_##word)
@@ -696,6 +738,45 @@ static const ClockMinuteRule s_swedish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef SE_WORD
 
+#define DK_WORD(word) CLOCK_WORD_SET_BIT(DK_WORD_##word)
+static const ClockMinuteRule s_danish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(OVER),
+    { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(OVER),
+    { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(ET) | DK_WORD(KVART) |
+        DK_WORD(OVER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(OVER),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(I) |
+        DK_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(OVER) |
+        DK_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(I),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(ET) | DK_WORD(KVART) |
+        DK_WORD(I), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(I),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    DK_WORD(KLOKKEN) | DK_WORD(ER) | DK_WORD(MINUTTER) | DK_WORD(I),
+    { 0, 0, 0 } },
+};
+#undef DK_WORD
+
 #define FR_WORD(word) CLOCK_WORD_SET_BIT(FR_WORD_##word)
 static const ClockHourOverride s_french_hour_overrides[] = {
   { 0, 0, CLOCK_HOUR_FORM_SPECIAL, FR_WORD(MINUIT) },
@@ -766,6 +847,13 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_danish_grid, { s_danish_numbers, s_danish_numbers },
+    s_danish_minute_quantities,
+    s_danish_words, DK_WORD_COUNT, 0, s_danish_minute_rules,
+    CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -789,6 +877,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "se") == 0) {
     return CLOCK_LANGUAGE_SE;
+  }
+  if (value && strcmp(value, "dk") == 0) {
+    return CLOCK_LANGUAGE_DK;
   }
   return CLOCK_LANGUAGE_EN;
 }
