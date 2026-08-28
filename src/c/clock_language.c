@@ -76,6 +76,17 @@ typedef enum {
 } DutchWord;
 
 typedef enum {
+  NO_WORD_KLOKKEN,
+  NO_WORD_ER,
+  NO_WORD_KVART,
+  NO_WORD_OVER,
+  NO_WORD_HALV,
+  NO_WORD_PA,
+  NO_WORD_PA_KVART,
+  NO_WORD_COUNT,
+} NorwegianWord;
+
+typedef enum {
   PT_WORD_E,
   PT_WORD_E_SINGULAR,
   PT_WORD_SAO,
@@ -547,6 +558,53 @@ static const ClockGridWord s_danish_words[DK_WORD_COUNT] = {
   { 4, 3, 4 }, { 4, 8, 1 }, { 5, 7, 4 }, { 6, 0, 2 },
 };
 
+// Matrix copied from the standard Norwegian QLOCKTWO front cover.
+static const char *const s_norwegian_grid[CLOCK_GRID_ROWS] = {
+  "KLOKKENVERM",
+  "FEMHP\u00c5SJUIS",
+  "TILP\u00c5SIDOSN",
+  "KVARTNP\u00c5STO",
+  "OVERXAMBPMZ",
+  "HALVBIEGENZ",
+  "ETTNTOATREX",
+  "FIREFEMSEKS",
+  "SYV\u00c5TTENITI",
+  "ELLEVESTOLV",
+};
+
+static const ClockGridWord s_norwegian_numbers[12] = {
+  { 6, 0, 3 },  // ETT
+  { 6, 4, 2 },  // TO
+  { 6, 7, 3 },  // TRE
+  { 7, 0, 4 },  // FIRE
+  { 7, 4, 3 },  // FEM
+  { 7, 7, 4 },  // SEKS
+  { 8, 0, 3 },  // SYV
+  { 8, 3, 4 },  // \u00c5TTE
+  { 8, 9, 2 },  // NI
+  { 2, 0, 2 },  // TI
+  { 9, 0, 6 },  // ELLEVE
+  { 9, 7, 4 },  // TOLV
+};
+
+static const ClockGridWord
+    s_norwegian_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 1, 0, 3 },  // FEM
+  { 2, 0, 2 },  // TI
+  { 0, 0, 0 },  // Not used by Norwegian phrasing
+  { 0, 0, 0 },  // Not used by Norwegian phrasing
+};
+
+static const ClockGridWord s_norwegian_words[NO_WORD_COUNT] = {
+  { 0, 0, 7 },  // KLOKKEN
+  { 0, 8, 2 },  // ER
+  { 3, 0, 5 },  // KVART
+  { 4, 0, 4 },  // OVER
+  { 5, 0, 4 },  // HALV
+  { 1, 4, 2 },  // P\u00c5
+  { 3, 6, 2 },  // P\u00c5 (for KVART P\u00c5)
+};
+
 // Each row represents 00, 05, ..., 55.  The data, rather than the renderer,
 // describes the order of the words and which hour is being named.
 #define EN_WORD(word) CLOCK_WORD_SET_BIT(EN_WORD_##word)
@@ -777,6 +835,24 @@ static const ClockMinuteRule s_danish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef DK_WORD
 
+#define NO_WORD(word) CLOCK_WORD_SET_BIT(NO_WORD_##word)
+static const ClockMinuteRule
+    s_norwegian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, NO_WORD(KLOKKEN) | NO_WORD(ER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(OVER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(OVER), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(KVART) | NO_WORD(OVER), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(PA) | NO_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(PA) | NO_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(OVER) | NO_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(OVER) | NO_WORD(HALV), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(KVART) | NO_WORD(PA_KVART), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(PA), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, NO_WORD(KLOKKEN) | NO_WORD(ER) | NO_WORD(PA), { 0, 0, 0 } },
+};
+#undef NO_WORD
+
 #define FR_WORD(word) CLOCK_WORD_SET_BIT(FR_WORD_##word)
 static const ClockHourOverride s_french_hour_overrides[] = {
   { 0, 0, CLOCK_HOUR_FORM_SPECIAL, FR_WORD(MINUIT) },
@@ -854,6 +930,13 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_norwegian_grid, { s_norwegian_numbers, s_norwegian_numbers },
+    s_norwegian_minute_quantities,
+    s_norwegian_words, NO_WORD_COUNT, 0, s_norwegian_minute_rules,
+    CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -880,6 +963,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "dk") == 0) {
     return CLOCK_LANGUAGE_DK;
+  }
+  if (value && strcmp(value, "no") == 0) {
+    return CLOCK_LANGUAGE_NO;
   }
   return CLOCK_LANGUAGE_EN;
 }

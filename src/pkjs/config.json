@@ -47,6 +47,10 @@
           {
             "label": "Dansk",
             "value": "dk"
+          },
+          {
+            "label": "Norsk",
+            "value": "no"
           }
         ]
       },
