@@ -235,11 +235,11 @@ static const ClockGridWord s_german_words[DE_WORD_COUNT] = {
   { 3, 6, 3 },  // VOR
 };
 
-// Matrix copied from the Italian QLOCKTWO front cover.  The apostrophe in
-// "l'una" is represented by the separate initial E ("e' l'una").
+// Matrix copied from the Italian QLOCKTWO front cover.  The leading apostrophe
+// is a custom one-cell font glyph that visually renders as "E'" for l'una.
 static const char *const s_italian_grid[CLOCK_GRID_ROWS] = {
   "SONORLEBORE",
-  "ERLUNASDUEZ",
+  "'R@UNASDUEZ",
   "TREOTTONOVE",
   "DIECIUNDICI",
   "DODICISETTE",
@@ -277,7 +277,7 @@ static const ClockGridWord s_italian_words[IT_WORD_COUNT] = {
   { 0, 0, 4 },  // SONO
   { 0, 5, 2 },  // LE
   { 7, 0, 1 },  // E
-  { 1, 0, 1 },  // E (for e' l'una)
+  { 1, 0, 1 },  // E' (one-cell glyph for e' l'una)
   { 0, 8, 3 },  // ORE
   { 9, 6, 5 },  // MEZZA
   { 7, 5, 6 },  // QUARTO
