@@ -150,7 +150,12 @@ set_watchface_options() {
 
   for attempt in 1 2 3; do
     if pebble send-app-message --emulator "$platform" --app-uuid "$APP_UUID" \
-      --string "10000=$language" "10001=$color"; then
+      --string "10000=$language" &&
+      # `pebble send-app-message` accepts multiple values syntactically, but
+      # the emulator CLI only delivers the first one. Send each setting in
+      # its own AppMessage so language and palette both reach the watchface.
+      pebble send-app-message --emulator "$platform" --app-uuid "$APP_UUID" \
+        --string "10001=$color"; then
       return 0
     fi
     sleep 1
