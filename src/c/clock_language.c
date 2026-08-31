@@ -255,7 +255,7 @@ static const ClockGridWord s_italian_numbers[12] = {
   { 1, 7, 3 },  // DUE
   { 2, 0, 3 },  // TRE
   { 5, 0, 7 },  // QUATTRO
-  { 8, 5, 6 },  // CINQUE
+  { 6, 0, 6 },  // CINQUE
   { 5, 8, 3 },  // SEI
   { 4, 6, 5 },  // SETTE
   { 2, 3, 4 },  // OTTO
@@ -267,7 +267,7 @@ static const ClockGridWord s_italian_numbers[12] = {
 
 static const ClockGridWord
     s_italian_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
-  { 6, 0, 6 },   // CINQUE
+  { 8, 5, 6 },   // CINQUE
   { 9, 0, 5 },   // DIECI
   { 8, 0, 5 },   // VENTI
   { 8, 0, 11 },  // VENTICINQUE
