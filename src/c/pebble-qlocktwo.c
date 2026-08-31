@@ -188,8 +188,10 @@ static void prv_init(void) {
   window_stack_push(s_window, true);
 
   app_message_register_inbox_received(prv_inbox_received_handler);
-  app_message_open(app_message_inbox_size_maximum(),
-                   app_message_outbox_size_maximum());
+  // Configuration updates contain only the two short Language and Color
+  // strings.  The maximum inbox and outbox allocations consume too much RAM
+  // on Aplite, causing incoming CLI AppMessages to be NACKed.
+  app_message_open(128, 0);
 
   time_t now = time(NULL);
   prv_update_time(localtime(&now));
