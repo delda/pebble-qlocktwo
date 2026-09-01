@@ -125,6 +125,21 @@ typedef enum {
   DK_WORD_COUNT,
 } DanishWord;
 
+typedef enum {
+  CA_WORD_ES,
+  CA_WORD_SON,
+  CA_WORD_LA,
+  CA_WORD_LES,
+  CA_WORD_UN,
+  CA_WORD_DOS,
+  CA_WORD_TRES,
+  CA_WORD_QUART,
+  CA_WORD_QUARTS,
+  CA_WORD_DE,
+  CA_WORD_I,
+  CA_WORD_COUNT,
+} CatalanWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -383,6 +398,59 @@ static const ClockGridWord s_spanish_words[ES_WORD_COUNT] = {
   { 9, 5, 6 },  // CUARTO
   { 6, 5, 1 },  // Y
   { 6, 6, 5 },  // MENOS
+};
+
+// Catalan QLOCKTWO uses the traditional quarter-based time system: after the
+// hour, the named hour is the following one (for example, 01:30 is "DOS
+// QUARTS DE DUES").
+static const char *const s_catalan_grid[CLOCK_GRID_ROWS] = {
+  "ESXXXSONLES",
+  "UNXDOSXTRES",
+  "QUARTSXDEXX",
+  "ICINCXDEUXX",
+  "UNALAXDUESX",
+  "TRESQUATREX",
+  "CINCSISSETX",
+  "VUITNOUDEUX",
+  "ONZEDOTZEXX",
+  "XXXXXXXXXXX",
+};
+
+static const ClockGridWord s_catalan_numbers[12] = {
+  { 4, 0, 3 },  // UNA
+  { 4, 6, 4 },  // DUES
+  { 5, 0, 4 },  // TRES
+  { 5, 4, 6 },  // QUATRE
+  { 6, 0, 4 },  // CINC
+  { 6, 4, 3 },  // SIS
+  { 6, 7, 3 },  // SET
+  { 7, 0, 4 },  // VUIT
+  { 7, 4, 3 },  // NOU
+  { 7, 7, 3 },  // DEU
+  { 8, 0, 4 },  // ONZE
+  { 8, 4, 5 },  // DOTZE
+};
+
+static const ClockGridWord
+    s_catalan_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 3, 1, 4 },  // CINC
+  { 3, 6, 3 },  // DEU
+  { 0, 0, 0 },  // Not used by Catalan phrasing
+  { 0, 0, 0 },  // Not used by Catalan phrasing
+};
+
+static const ClockGridWord s_catalan_words[CA_WORD_COUNT] = {
+  { 0, 0, 2 },  // ES
+  { 0, 5, 3 },  // SON
+  { 4, 3, 2 },  // LA
+  { 0, 8, 3 },  // LES
+  { 1, 0, 2 },  // UN
+  { 1, 3, 3 },  // DOS
+  { 1, 7, 4 },  // TRES
+  { 2, 0, 5 },  // QUART
+  { 2, 0, 6 },  // QUARTS
+  { 2, 7, 2 },  // DE
+  { 3, 0, 1 },  // I
 };
 
 // Matrix copied from the standard Dutch QLOCKTWO front cover.
@@ -710,6 +778,35 @@ static const ClockMinuteRule s_spanish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef ES_WORD
 
+#define CA_WORD(word) CLOCK_WORD_SET_BIT(CA_WORD_##word)
+static const ClockMinuteRule s_catalan_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, 0,
+    { CA_WORD(ES) | CA_WORD(LA), CA_WORD(SON) | CA_WORD(LES), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, CA_WORD(I),
+    { CA_WORD(ES) | CA_WORD(LA), CA_WORD(SON) | CA_WORD(LES), 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, CA_WORD(I),
+    { CA_WORD(ES) | CA_WORD(LA), CA_WORD(SON) | CA_WORD(LES), 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    CA_WORD(UN) | CA_WORD(QUART) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    CA_WORD(UN) | CA_WORD(QUART) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    CA_WORD(UN) | CA_WORD(QUART) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    CA_WORD(DOS) | CA_WORD(QUARTS) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    CA_WORD(DOS) | CA_WORD(QUARTS) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    CA_WORD(DOS) | CA_WORD(QUARTS) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    CA_WORD(TRES) | CA_WORD(QUARTS) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    CA_WORD(TRES) | CA_WORD(QUARTS) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    CA_WORD(TRES) | CA_WORD(QUARTS) | CA_WORD(I) | CA_WORD(DE), { 0, 0, 0 } },
+};
+#undef CA_WORD
+
 #define NL_WORD(word) CLOCK_WORD_SET_BIT(NL_WORD_##word)
 static const ClockMinuteRule s_dutch_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE,
@@ -939,6 +1036,13 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_catalan_grid, { s_catalan_numbers, s_catalan_numbers },
+    s_catalan_minute_quantities,
+    s_catalan_words, CA_WORD_COUNT, 0, s_catalan_minute_rules,
+    CLOCK_HOUR_FORM_ONE,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -968,6 +1072,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "no") == 0) {
     return CLOCK_LANGUAGE_NO;
+  }
+  if (value && strcmp(value, "ca") == 0) {
+    return CLOCK_LANGUAGE_CA;
   }
   return CLOCK_LANGUAGE_EN;
 }
