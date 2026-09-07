@@ -55,6 +55,10 @@
           {
             "label": "Català",
             "value": "ca"
+          },
+          {
+            "label": "Türkçe",
+            "value": "tr"
           }
         ]
       },

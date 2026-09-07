@@ -140,6 +140,20 @@ typedef enum {
   CA_WORD_COUNT,
 } CatalanWord;
 
+typedef enum {
+  TR_WORD_SAAT,
+  TR_WORD_ON,
+  TR_WORD_BUCUK,
+  TR_WORD_CEYREK,
+  TR_WORD_GECIYOR,
+  TR_WORD_YIRMI,
+  TR_WORD_OTUZ,
+  TR_WORD_KIRK,
+  TR_WORD_ELLI,
+  TR_WORD_BES,
+  TR_WORD_COUNT,
+} TurkishWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -451,6 +465,51 @@ static const ClockGridWord s_catalan_words[CA_WORD_COUNT] = {
   { 2, 0, 6 },  // QUARTS
   { 2, 7, 2 },  // DE
   { 3, 0, 1 },  // I
+};
+
+// Matrix copied from the Turkish QLOCKTWO front cover. Turkish expresses
+// fractional times as the current hour in the accusative followed by the
+// number of minutes and "geçiyor" (is passing).
+static const char *const s_turkish_grid[CLOCK_GRID_ROWS] = {
+  "SAATRONU\u00dc\u00c7\u00dc",
+  "B\u0130R\u0130ALTIYID",
+  "\u0130K\u0130Y\u0130DOKUZU",
+  "D\u00d6RD\u00dcYED\u0130Y\u0130",
+  "SEK\u0130Z\u0130YARIM",
+  "D\u00d6RTAMSBE\u015e\u0130",
+  "KPMOTUZKIRK",
+  "ELL\u0130ONY\u0130RM\u0130",
+  "BU\u00c7UK\u00c7EYREK",
+  "BE\u015eMGE\u00c7\u0130YOR",
+};
+
+// The first form is accusative (for example, "dördü beş geçiyor"); the
+// second is the plain form used on the hour and at half past. Eleven and
+// twelve are assembled with the ON word below.
+static const ClockGridWord s_turkish_numbers[CLOCK_NUMBER_FORM_COUNT][12] = {
+  [CLOCK_NUMBER_FORM_DEFAULT] = {
+    { 1, 0, 4 }, { 2, 0, 5 }, { 0, 8, 3 }, { 3, 0, 5 },
+    { 5, 7, 4 }, { 1, 4, 6 }, { 3, 5, 6 }, { 4, 0, 6 },
+    { 2, 5, 6 }, { 0, 5, 3 }, { 1, 0, 4 }, { 2, 0, 5 },
+  },
+  [CLOCK_NUMBER_FORM_OCLOCK] = {
+    { 1, 0, 3 }, { 2, 0, 3 }, { 0, 8, 2 }, { 3, 0, 4 },
+    { 5, 7, 3 }, { 1, 4, 4 }, { 3, 5, 4 }, { 4, 0, 5 },
+    { 2, 5, 5 }, { 0, 5, 2 }, { 1, 0, 3 }, { 2, 0, 3 },
+  },
+};
+
+static const ClockGridWord s_turkish_words[TR_WORD_COUNT] = {
+  { 0, 0, 4 },  // SAAT
+  { 0, 5, 2 },  // ON
+  { 8, 0, 5 },  // BUÇUK
+  { 8, 5, 6 },  // ÇEYREK
+  { 9, 4, 7 },  // GEÇİYOR
+  { 7, 6, 5 },  // YİRMİ
+  { 6, 3, 4 },  // OTUZ
+  { 6, 7, 4 },  // KIRK
+  { 7, 0, 4 },  // ELLİ
+  { 9, 0, 3 },  // BEŞ
 };
 
 // Matrix copied from the standard Dutch QLOCKTWO front cover.
@@ -807,6 +866,30 @@ static const ClockMinuteRule s_catalan_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef CA_WORD
 
+#define TR_WORD(word) CLOCK_WORD_SET_BIT(TR_WORD_##word)
+static const ClockMinuteRule s_turkish_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(SAAT), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(BES) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(ON) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(CEYREK) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(YIRMI) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(YIRMI) | TR_WORD(BES) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(BUCUK), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(OTUZ) | TR_WORD(BES) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(KIRK) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(KIRK) | TR_WORD(BES) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(ELLI) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, TR_WORD(ELLI) | TR_WORD(BES) | TR_WORD(GECIYOR), { 0, 0, 0 } },
+};
+
+static const ClockHourOverride s_turkish_hour_overrides[] = {
+  { 0, 2, CLOCK_HOUR_FORM_OTHER, TR_WORD(ON) },
+  { 11, 1, CLOCK_HOUR_FORM_OTHER, TR_WORD(ON) },
+  { 12, 2, CLOCK_HOUR_FORM_OTHER, TR_WORD(ON) },
+  { 23, 1, CLOCK_HOUR_FORM_OTHER, TR_WORD(ON) },
+};
+#undef TR_WORD
+
 #define NL_WORD(word) CLOCK_WORD_SET_BIT(NL_WORD_##word)
 static const ClockMinuteRule s_dutch_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE,
@@ -1043,6 +1126,18 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_ONE,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_turkish_grid,
+    {
+      s_turkish_numbers[CLOCK_NUMBER_FORM_DEFAULT],
+      s_turkish_numbers[CLOCK_NUMBER_FORM_OCLOCK],
+    },
+    NULL, s_turkish_words, TR_WORD_COUNT,
+    CLOCK_WORD_SET_BIT(TR_WORD_SAAT) | CLOCK_WORD_SET_BIT(TR_WORD_BUCUK),
+    s_turkish_minute_rules, CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, s_turkish_hour_overrides,
+    sizeof(s_turkish_hour_overrides) / sizeof(s_turkish_hour_overrides[0]),
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -1075,6 +1170,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "ca") == 0) {
     return CLOCK_LANGUAGE_CA;
+  }
+  if (value && strcmp(value, "tr") == 0) {
+    return CLOCK_LANGUAGE_TR;
   }
   return CLOCK_LANGUAGE_EN;
 }
