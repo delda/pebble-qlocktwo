@@ -397,7 +397,7 @@ static const ClockGridWord s_spanish_numbers[12] = {
 
 static const ClockGridWord
     s_spanish_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
-  { 2, 6, 5 },  // CINCO
+  { 8, 6, 5 },  // CINCO
   { 7, 7, 4 },  // DIEZ
   { 7, 1, 6 },  // VEINTE
   { 8, 0, 11 }, // VEINTICINCO
