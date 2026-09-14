@@ -26,6 +26,20 @@ typedef enum {
 } GermanWord;
 
 typedef enum {
+  CH_WORD_ES,
+  CH_WORD_ISCH,
+  CH_WORD_A,
+  CH_WORD_FUEF,
+  CH_WORD_VIERTU,
+  CH_WORD_ZAER,
+  CH_WORD_ZWAENZG,
+  CH_WORD_AB,
+  CH_WORD_VOR,
+  CH_WORD_HAUBI,
+  CH_WORD_COUNT,
+} SwissGermanWord;
+
+typedef enum {
   IT_WORD_SONO,
   IT_WORD_LE,
   IT_WORD_AND,
@@ -262,6 +276,33 @@ static const ClockGridWord s_german_words[DE_WORD_COUNT] = {
   { 2, 4, 7 },  // VIERTEL
   { 3, 2, 4 },  // NACH
   { 3, 6, 3 },  // VOR
+};
+
+// Matrix copied from the Swiss German (Bernese) QLOCKTWO front cover.
+static const char *const s_swiss_german_grid[CLOCK_GRID_ROWS] = {
+  "ESKISCHAF\u00dcF", "VIERTUBFZ\u00c4\u00c4", "ZW\u00c4NZGSIVOR", "ABOHAUBIEGE",
+  "EISZW\u00d6ISDR\u00dc", "VIERIF\u00dcFIQT", "S\u00c4CHSISIBNI", "ACHTIN\u00dcNIEL",
+  "Z\u00c4NIERBEUFI", "ZW\u00d6UFINAUHR",
+};
+
+static const ClockGridWord s_swiss_german_numbers[12] = {
+  { 4, 0, 3 }, { 4, 3, 4 }, { 4, 8, 3 }, { 5, 0, 5 },
+  { 5, 5, 4 }, { 6, 0, 6 }, { 6, 6, 5 }, { 7, 0, 5 },
+  { 7, 5, 4 }, { 8, 0, 4 }, { 8, 7, 4 }, { 9, 0, 6 },
+};
+
+static const ClockGridWord
+    s_swiss_german_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 0, 8, 3 },  // F\u00dcF
+  { 1, 8, 3 },  // Z\u00c4\u00c4
+  { 2, 0, 6 },  // ZW\u00c4NZG
+  { 0, 0, 0 },  // Expressed as F\u00dcF VOR HAUBI
+};
+
+static const ClockGridWord s_swiss_german_words[CH_WORD_COUNT] = {
+  { 0, 0, 2 }, { 0, 3, 4 }, { 0, 7, 1 }, { 0, 8, 3 },
+  { 1, 0, 6 }, { 1, 8, 3 }, { 2, 0, 6 }, { 3, 0, 2 },
+  { 2, 8, 3 }, { 3, 3, 5 },
 };
 
 // Matrix copied from the Italian QLOCKTWO front cover.  The leading apostrophe
@@ -786,6 +827,24 @@ static const ClockMinuteRule s_german_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef DE_WORD
 
+#define CH_WORD(word) CLOCK_WORD_SET_BIT(CH_WORD_##word)
+static const ClockMinuteRule
+    s_swiss_german_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(A), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(AB), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(AB), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VIERTU) | CH_WORD(AB), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(AB), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VOR) | CH_WORD(HAUBI), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(HAUBI), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(AB) | CH_WORD(HAUBI), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VIERTU) | CH_WORD(VOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VOR), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE, CH_WORD(ES) | CH_WORD(ISCH) | CH_WORD(VOR), { 0, 0, 0 } },
+};
+#undef CH_WORD
+
 #define IT_WORD(word) CLOCK_WORD_SET_BIT(IT_WORD_##word)
 static const ClockMinuteRule s_italian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE, 0, { IT_WORD(SINGULAR_PREFIX), IT_WORD(SONO) | IT_WORD(LE) | IT_WORD(ORE), 0 } },
@@ -1138,6 +1197,12 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_OTHER, s_turkish_hour_overrides,
     sizeof(s_turkish_hour_overrides) / sizeof(s_turkish_hour_overrides[0]),
   },
+  {
+    s_swiss_german_grid, { s_swiss_german_numbers, s_swiss_german_numbers },
+    s_swiss_german_minute_quantities, s_swiss_german_words, CH_WORD_COUNT,
+    0, s_swiss_german_minute_rules, CLOCK_HOUR_FORM_OTHER,
+    CLOCK_HOUR_FORM_OTHER, NULL, 0,
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -1173,6 +1238,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "tr") == 0) {
     return CLOCK_LANGUAGE_TR;
+  }
+  if (value && strcmp(value, "ch") == 0) {
+    return CLOCK_LANGUAGE_CH;
   }
   return CLOCK_LANGUAGE_EN;
 }
