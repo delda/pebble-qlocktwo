@@ -29,11 +29,12 @@ choice is stored on the watch and retained across restarts.
 
 - aplite — Pebble
 - basalt — Pebble Time
+- chalk — Pebble Time Round
 - diorite — Pebble Time Steel
 - emery — Pebble Time 2
 - flint — Pebble 2
 
-The round chalk and gabbro platforms are not supported.
+The gabbro platform is not supported.
 
 ## Development
 
