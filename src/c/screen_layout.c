@@ -8,6 +8,7 @@
 #define GRID_REFERENCE_VERTICAL_OFFSET 9
 #define ROUND_GRID_SQUARE_SIDE_NUMERATOR 1000
 #define ROUND_GRID_SQUARE_DIAGONAL 1414
+#define GABBRO_GRID_SIDE_EXPANSION 1
 
 static int16_t prv_scale_from_reference_height(int16_t value,
                                                int16_t display_height) {
@@ -21,8 +22,7 @@ static int16_t prv_grid_vertical_offset(int16_t display_height) {
          GRID_REFERENCE_DISPLAY_HEIGHT;
 }
 
-static GRect prv_grid_bounds(GRect bounds) {
-#ifdef PBL_ROUND
+static GRect prv_round_grid_bounds(GRect bounds) {
   // A square's diagonal is its side times sqrt(2). The 1000:1414 ratio is
   // sqrt(2) in integer form, so the square touches the circular display.
   const int16_t grid_side =
@@ -32,9 +32,23 @@ static GRect prv_grid_bounds(GRect bounds) {
   return GRect(bounds.origin.x + (bounds.size.w - grid_side) / 2,
                bounds.origin.y + (bounds.size.h - grid_side) / 2,
                grid_side, grid_side);
-#else
-  return bounds;
-#endif
+}
+
+static GRect prv_gabbro_grid_bounds(GRect bounds) {
+  const int16_t grid_side =
+      (bounds.size.w * ROUND_GRID_SQUARE_SIDE_NUMERATOR) /
+          ROUND_GRID_SQUARE_DIAGONAL +
+      GABBRO_GRID_SIDE_EXPANSION;
+
+  return GRect(bounds.origin.x + (bounds.size.w - grid_side) / 2,
+               bounds.origin.y + (bounds.size.h - grid_side) / 2,
+               grid_side, grid_side);
+}
+
+static GRect prv_grid_bounds(GRect bounds) {
+  return PBL_PLATFORM_SWITCH(PBL_PLATFORM_TYPE_CURRENT, bounds, bounds,
+                             prv_round_grid_bounds(bounds), bounds, bounds,
+                             bounds, prv_gabbro_grid_bounds(bounds));
 }
 
 ScreenLayout screen_layout_create(GRect bounds, uint8_t columns, uint8_t rows,
@@ -78,16 +92,26 @@ void screen_layout_draw_minute_dots(GContext *ctx, const ScreenLayout *layout,
                                                        : count;
   const uint8_t first_dot_boundary =
       (layout->columns - MINUTE_DOT_COUNT + 1) / 2;
+  const int16_t default_first_dot_x =
+      first_dot_boundary * layout->cell_width + layout->bounds.origin.x;
+  const int16_t centered_first_dot_x =
+      layout->bounds.origin.x +
+      (layout->bounds.size.w -
+       (MINUTE_DOT_COUNT - 1) * layout->cell_width) /
+          2;
+  const int16_t first_dot_x = PBL_PLATFORM_SWITCH(
+      PBL_PLATFORM_TYPE_CURRENT, default_first_dot_x, default_first_dot_x,
+      default_first_dot_x, default_first_dot_x, default_first_dot_x,
+      default_first_dot_x, centered_first_dot_x);
   const int16_t horizontal_offset = PBL_PLATFORM_SWITCH(
       PBL_PLATFORM_TYPE_CURRENT, 0, 0, 2, 0, 0, 0, 0);
   const int16_t vertical_offset = PBL_PLATFORM_SWITCH(
-      PBL_PLATFORM_TYPE_CURRENT, 0, 0, 6, 0, 0, 0, 0);
+      PBL_PLATFORM_TYPE_CURRENT, 0, 0, 6, 0, 0, 0, 4);
 
   graphics_context_set_fill_color(ctx, color);
   for (uint8_t index = 0; index < dot_count; ++index) {
     graphics_fill_circle(ctx,
-                         GPoint((first_dot_boundary + index) *
-                                    layout->cell_width + layout->bounds.origin.x +
+                         GPoint(first_dot_x + index * layout->cell_width +
                                     horizontal_offset,
                                 layout->minute_dot_y + vertical_offset),
                          DOT_RADIUS);

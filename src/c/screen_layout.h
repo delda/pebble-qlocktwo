@@ -3,8 +3,8 @@
 #include <pebble.h>
 
 typedef struct {
-  // The portion of the display occupied by the word grid. On round watches it
-  // is a centred square inscribed in the display; elsewhere it matches the
+  // The portion of the display occupied by the word grid. On Chalk and Gabbro
+  // it is a centred square inscribed in the display; elsewhere it matches the
   // layer bounds.
   GRect bounds;
   uint8_t columns;

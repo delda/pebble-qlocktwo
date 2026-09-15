@@ -33,8 +33,7 @@ choice is stored on the watch and retained across restarts.
 - diorite — Pebble Time Steel
 - emery — Pebble Time 2
 - flint — Pebble 2
-
-The gabbro platform is not supported.
+- gabbro — Pebble 2 Round
 
 ## Development
 
