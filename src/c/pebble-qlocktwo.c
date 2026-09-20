@@ -6,10 +6,12 @@
 
 #define PERSIST_KEY_COLOR_THEME 1
 #define PERSIST_KEY_CLOCK_LANGUAGE 2
+#define CZECH_GRID_INSET 10
 
 static Window *s_window;
 static Layer *s_grid_layer;
 static GFont s_letter_font;
+static bool s_letter_font_is_custom;
 static ClockLanguage s_clock_language = CLOCK_LANGUAGE_EN;
 static const ClockLanguageProfile *s_clock_profile;
 static uint8_t s_hours;
@@ -17,13 +19,21 @@ static uint8_t s_minutes_rounded_to_five;
 static uint8_t s_minutes_modulo_five;
 static ColorThemeId s_color_theme = COLOR_THEME_BLACK;
 
+static void prv_reload_letter_font(void);
+
 static void prv_inbox_received_handler(DictionaryIterator *iterator,
                                        void *context) {
   Tuple *language = dict_find(iterator, MESSAGE_KEY_Language);
   if (language && language->type == TUPLE_CSTRING) {
-    s_clock_language = clock_language_from_string(language->value->cstring);
+    const ClockLanguage requested_language =
+        clock_language_from_string(language->value->cstring);
+    const bool language_changed = requested_language != s_clock_language;
+    s_clock_language = requested_language;
     s_clock_profile = clock_language_get_profile(s_clock_language);
     persist_write_int(PERSIST_KEY_CLOCK_LANGUAGE, s_clock_language);
+    if (language_changed && s_grid_layer) {
+      prv_reload_letter_font();
+    }
     layer_mark_dirty(s_grid_layer);
   }
 
@@ -99,14 +109,19 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
 }
 
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
-  const ScreenLayout layout = screen_layout_create(layer_get_bounds(layer),
+  const GRect layer_bounds = layer_get_bounds(layer);
+  const GRect grid_bounds = s_clock_language == CLOCK_LANGUAGE_CZ
+                               ? grect_inset(layer_bounds,
+                                             GEdgeInsets(CZECH_GRID_INSET))
+                               : layer_bounds;
+  const ScreenLayout layout = screen_layout_create(grid_bounds,
                                                     CLOCK_GRID_COLUMNS,
                                                     CLOCK_GRID_ROWS,
                                                     s_letter_font);
   const ColorTheme *theme = color_theme_get(s_color_theme);
 
   graphics_context_set_fill_color(ctx, theme->background);
-  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
+  graphics_fill_rect(ctx, layer_bounds, 0, GCornerNone);
 
   for (int row = 0; row < CLOCK_GRID_ROWS; ++row) {
     for (int column = 0; column < CLOCK_GRID_COLUMNS; ++column) {
@@ -123,14 +138,7 @@ static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
       graphics_context_set_text_color(ctx,
                                       is_active ? theme->active_text
                                                 : theme->inactive_text);
-      // Pebble custom fonts have no bold style; draw a second, one-pixel-shifted
-      // glyph to give every letter a consistent bold weight.
       graphics_draw_text(ctx, letter, layout.letter_font, cell,
-                         GTextOverflowModeTrailingEllipsis,
-                         GTextAlignmentCenter, NULL);
-      graphics_draw_text(ctx, letter, layout.letter_font,
-                         GRect(cell.origin.x + 1, cell.origin.y,
-                               cell.size.w, cell.size.h),
                          GTextOverflowModeTrailingEllipsis,
                          GTextAlignmentCenter, NULL);
     }
@@ -151,11 +159,40 @@ static uint32_t prv_letter_font_resource_id(void) {
       RESOURCE_ID_FONT_WORDCLOCK_STENCIL_MONO_18);
 }
 
+static GFont prv_load_stencil_letter_font(void) {
+  s_letter_font_is_custom = true;
+  return fonts_load_custom_font(
+      resource_get_handle(prv_letter_font_resource_id()));
+}
+
+static GFont prv_load_czech_letter_font(void) {
+  // Gothic includes the Czech diacritics. Its 14 px variant leaves vertical
+  // clearance for accents in the compact word-grid rows.
+  s_letter_font_is_custom = false;
+  return fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD);
+}
+
+static GFont prv_load_letter_font(void) {
+  return s_clock_language == CLOCK_LANGUAGE_CZ
+             ? prv_load_czech_letter_font()
+             : prv_load_stencil_letter_font();
+}
+
+static void prv_unload_letter_font(void) {
+  if (s_letter_font_is_custom) {
+    fonts_unload_custom_font(s_letter_font);
+  }
+}
+
+static void prv_reload_letter_font(void) {
+  prv_unload_letter_font();
+  s_letter_font = prv_load_letter_font();
+}
+
 static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
 
-  s_letter_font = fonts_load_custom_font(
-      resource_get_handle(prv_letter_font_resource_id()));
+  s_letter_font = prv_load_letter_font();
   s_grid_layer = layer_create(layer_get_bounds(window_layer));
   layer_set_update_proc(s_grid_layer, prv_grid_layer_update);
   layer_add_child(window_layer, s_grid_layer);
@@ -163,7 +200,7 @@ static void prv_window_load(Window *window) {
 
 static void prv_window_unload(Window *window) {
   layer_destroy(s_grid_layer);
-  fonts_unload_custom_font(s_letter_font);
+  prv_unload_letter_font();
 }
 
 static void prv_init(void) {

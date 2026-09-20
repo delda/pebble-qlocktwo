@@ -63,6 +63,10 @@
           {
             "label": "Schwyzerdütsch",
             "value": "ch"
+          },
+          {
+            "label": "Čeština",
+            "value": "cz"
           }
         ]
       },

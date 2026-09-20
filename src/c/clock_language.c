@@ -168,6 +168,20 @@ typedef enum {
   TR_WORD_COUNT,
 } TurkishWord;
 
+typedef enum {
+  CZ_WORD_JE,
+  CZ_WORD_JSOU,
+  CZ_WORD_NULA,
+  CZ_WORD_PET,
+  CZ_WORD_DESET,
+  CZ_WORD_PATNACT,
+  CZ_WORD_DVACET,
+  CZ_WORD_TRICET,
+  CZ_WORD_CTYRICET,
+  CZ_WORD_PADESAT,
+  CZ_WORD_COUNT,
+} CzechWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -213,6 +227,49 @@ static const ClockGridWord s_english_words[EN_WORD_COUNT] = {
   { 1, 2, 7 },  // QUARTER
   { 4, 0, 4 },  // PAST
   { 3, 9, 2 },  // TO
+};
+
+// Matrix copied from the Czech QLOCKTWO front cover. Czech expresses the
+// display as "JE/JSOU <hour> <minute>", including NULA on the hour.
+static const char *const s_czech_grid[CLOCK_GRID_ROWS] = {
+  "JEJSOUJEDNA",
+  "DEV\u011aTP\u011aTDV\u011a",
+  "SEDMDVAN\u00c1CT",
+  "DESET\u0158I\u0160EST",
+  "OSMJEDEN\u00c1CT",
+  "\u010cTY\u0158IADESET",
+  "DVACET\u0158ICET",
+  "PATN\u00c1CTNULA",
+  "ME\u010cTY\u0158ICETM",
+  "PADES\u00c1TP\u011aT",
+};
+
+static const ClockGridWord s_czech_numbers[12] = {
+  { 0, 5, 6 },  // JEDNA
+  { 1, 8, 3 },  // DV\u011a
+  { 3, 4, 3 },  // T\u0158I
+  { 5, 0, 5 },  // \u010cTY\u0158I
+  { 1, 5, 3 },  // P\u011aT
+  { 3, 7, 4 },  // \u0160EST
+  { 2, 0, 4 },  // SEDM
+  { 4, 0, 3 },  // OSM
+  { 1, 0, 5 },  // DEV\u011aT
+  { 3, 0, 5 },  // DESET
+  { 4, 3, 8 },  // JEDEN\u00c1CT
+  { 2, 4, 7 },  // DVAN\u00c1CT
+};
+
+static const ClockGridWord s_czech_words[CZ_WORD_COUNT] = {
+  { 0, 0, 2 },  // JE
+  { 0, 2, 4 },  // JSOU
+  { 7, 7, 4 },  // NULA
+  { 9, 8, 3 },  // P\u011aT
+  { 5, 6, 5 },  // DESET
+  { 7, 0, 7 },  // PATN\u00c1CT
+  { 6, 0, 6 },  // DVACET
+  { 6, 5, 6 },  // T\u0158ICET
+  { 8, 2, 8 },  // \u010cTY\u0158ICET
+  { 9, 0, 7 },  // PADES\u00c1T
 };
 
 // Matrix copied from the standard German QLOCKTWO front cover.
@@ -794,6 +851,44 @@ static const ClockMinuteRule s_english_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
 };
 #undef EN_WORD
 
+#define CZ_WORD(word) CLOCK_WORD_SET_BIT(CZ_WORD_##word)
+static const ClockMinuteRule s_czech_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(NULA),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(PET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(DESET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(PATNACT),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(DVACET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(DVACET) | CZ_WORD(PET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(TRICET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(TRICET) | CZ_WORD(PET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(CTYRICET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(CTYRICET) | CZ_WORD(PET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(PADESAT),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE, CZ_WORD(PADESAT) | CZ_WORD(PET),
+    { CZ_WORD(JE), CZ_WORD(JE), CZ_WORD(JSOU) } },
+};
+
+static const ClockHourOverride s_czech_hour_overrides[] = {
+  { 2, 2, CLOCK_HOUR_FORM_SPECIAL, 0 },
+  { 3, 3, CLOCK_HOUR_FORM_SPECIAL, 0 },
+  { 4, 4, CLOCK_HOUR_FORM_SPECIAL, 0 },
+  { 14, 2, CLOCK_HOUR_FORM_SPECIAL, 0 },
+  { 15, 3, CLOCK_HOUR_FORM_SPECIAL, 0 },
+  { 16, 4, CLOCK_HOUR_FORM_SPECIAL, 0 },
+};
+#undef CZ_WORD
+
 #define DE_WORD(word) CLOCK_WORD_SET_BIT(DE_WORD_##word)
 static const ClockMinuteRule s_german_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE,
@@ -1203,6 +1298,12 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     0, s_swiss_german_minute_rules, CLOCK_HOUR_FORM_OTHER,
     CLOCK_HOUR_FORM_OTHER, NULL, 0,
   },
+  {
+    s_czech_grid, { s_czech_numbers, s_czech_numbers }, NULL,
+    s_czech_words, CZ_WORD_COUNT, 0, s_czech_minute_rules,
+    CLOCK_HOUR_FORM_ONE, CLOCK_HOUR_FORM_OTHER, s_czech_hour_overrides,
+    sizeof(s_czech_hour_overrides) / sizeof(s_czech_hour_overrides[0]),
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -1241,6 +1342,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "ch") == 0) {
     return CLOCK_LANGUAGE_CH;
+  }
+  if (value && strcmp(value, "cz") == 0) {
+    return CLOCK_LANGUAGE_CZ;
   }
   return CLOCK_LANGUAGE_EN;
 }
