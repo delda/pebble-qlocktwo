@@ -6,7 +6,7 @@
 
 #define PERSIST_KEY_COLOR_THEME 1
 #define PERSIST_KEY_CLOCK_LANGUAGE 2
-#define CZECH_GRID_INSET 10
+#define SYSTEM_FONT_GRID_INSET 10
 
 static Window *s_window;
 static Layer *s_grid_layer;
@@ -110,9 +110,10 @@ static bool prv_is_phrase_letter(uint8_t row, uint8_t column) {
 
 static void prv_grid_layer_update(Layer *layer, GContext *ctx) {
   const GRect layer_bounds = layer_get_bounds(layer);
-  const GRect grid_bounds = s_clock_language == CLOCK_LANGUAGE_CZ
+  const GRect grid_bounds = (s_clock_language == CLOCK_LANGUAGE_CZ ||
+                             s_clock_language == CLOCK_LANGUAGE_RO)
                                ? grect_inset(layer_bounds,
-                                             GEdgeInsets(CZECH_GRID_INSET))
+                                             GEdgeInsets(SYSTEM_FONT_GRID_INSET))
                                : layer_bounds;
   const ScreenLayout layout = screen_layout_create(grid_bounds,
                                                     CLOCK_GRID_COLUMNS,
@@ -173,7 +174,8 @@ static GFont prv_load_czech_letter_font(void) {
 }
 
 static GFont prv_load_letter_font(void) {
-  return s_clock_language == CLOCK_LANGUAGE_CZ
+  return (s_clock_language == CLOCK_LANGUAGE_CZ ||
+          s_clock_language == CLOCK_LANGUAGE_RO)
              ? prv_load_czech_letter_font()
              : prv_load_stencil_letter_font();
 }

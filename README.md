@@ -17,7 +17,7 @@ example, at 10:07 the watchface shows `IT IS FIVE PAST TEN` and two dots.
 
 The grid and time phrases are available in English, Italian, French, Spanish,
 German, Dutch, Portuguese, Swedish, Danish, Norwegian, Catalan, Turkish,
-Swiss German (Bernese), and Czech.
+Swiss German (Bernese), Czech, and Romanian.
 
 ## Customisation
 
@@ -34,6 +34,12 @@ choice is stored on the watch and retained across restarts.
 - emery — Pebble Time 2
 - flint — Pebble 2
 - gabbro — Pebble 2 Round
+
+### Basalt feature policy
+
+On Basalt, step count and weather are disabled by default. The watchface does
+not request Pebble Health data, fetch weather data, or load heart-rate data;
+Basalt has no built-in heart-rate sensor.
 
 ## Development
 

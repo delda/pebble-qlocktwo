@@ -67,6 +67,10 @@
           {
             "label": "Čeština",
             "value": "cz"
+          },
+          {
+            "label": "Română",
+            "value": "ro"
           }
         ]
       },

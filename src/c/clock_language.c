@@ -182,6 +182,22 @@ typedef enum {
   CZ_WORD_COUNT,
 } CzechWord;
 
+typedef enum {
+  RO_WORD_ESTE,
+  RO_WORD_SI,
+  RO_WORD_ORA,
+  RO_WORD_UN,
+  RO_WORD_FARA,
+  RO_WORD_SFERT,
+  RO_WORD_JUMATATE,
+  RO_WORD_DOUA,
+  RO_WORD_SPREZECE,
+  RO_WORD_DOUAZECI,
+  RO_WORD_CINCI,
+  RO_WORD_ZECE,
+  RO_WORD_COUNT,
+} RomanianWord;
+
 static const char *const s_english_grid[CLOCK_GRID_ROWS] = {
   "ITLISASTIME",
   "ACQUARTERDC",
@@ -270,6 +286,58 @@ static const ClockGridWord s_czech_words[CZ_WORD_COUNT] = {
   { 6, 5, 6 },  // T\u0158ICET
   { 8, 2, 8 },  // \u010cTY\u0158ICET
   { 9, 0, 7 },  // PADES\u00c1T
+};
+
+// Romanian matrix using the system font for its diacritics.
+static const char *const s_romanian_grid[CLOCK_GRID_ROWS] = {
+  "ESTE\u0218IORAXX",
+  "JUM\u0102TATEXXX",
+  "XXXSPREZECE",
+  "F\u0102R\u0102SFERTXX",
+  "DOU\u0102ZECIXXX",
+  "UNUDOITREIX",
+  "PATRUCINCIX",
+  "\u0218ASE\u0218APTEXX",
+  "OPTNOU\u0102ZECE",
+  "UNSPREZECEX",
+};
+
+static const ClockGridWord s_romanian_numbers[12] = {
+  { 5, 0, 3 },   // UNU
+  { 4, 0, 4 },   // DOUĂ
+  { 5, 6, 4 },   // TREI
+  { 6, 0, 5 },   // PATRU
+  { 6, 5, 5 },   // CINCI
+  { 7, 0, 4 },   // ȘASE
+  { 7, 4, 5 },   // ȘAPTE
+  { 8, 0, 3 },   // OPT
+  { 8, 3, 4 },   // NOUĂ
+  { 8, 7, 4 },   // ZECE
+  { 9, 0, 10 },  // UNSPREZECE
+  { 4, 0, 4 },   // DOUĂ (12 is composed with SPREZECE)
+};
+
+static const ClockGridWord
+    s_romanian_minute_quantities[CLOCK_MINUTE_QUANTITY_COUNT - 1] = {
+  { 6, 5, 5 },  // CINCI
+  { 8, 7, 4 },  // ZECE
+  { 4, 0, 8 },  // DOUĂZECI
+  { 0, 0, 0 },  // Expressed as DOUĂZECI ȘI CINCI
+};
+
+static const ClockGridWord s_romanian_words[RO_WORD_COUNT] = {
+  { 0, 0, 4 },  // ESTE
+  { 0, 4, 2 },  // ȘI
+  { 0, 6, 3 },  // ORA
+  { 5, 0, 2 },  // UN
+  { 3, 0, 4 },  // FĂRĂ
+  { 3, 4, 5 },  // SFERT
+  { 1, 0, 8 },  // JUMĂTATE
+  { 4, 0, 4 },  // DOUĂ
+  { 2, 3, 8 },  // SPREZECE
+  { 4, 0, 8 },  // DOUĂZECI
+  { 6, 5, 5 },  // CINCI
+  { 8, 7, 4 },  // ZECE
 };
 
 // Matrix copied from the standard German QLOCKTWO front cover.
@@ -889,6 +957,51 @@ static const ClockHourOverride s_czech_hour_overrides[] = {
 };
 #undef CZ_WORD
 
+#define RO_WORD(word) CLOCK_WORD_SET_BIT(RO_WORD_##word)
+static const ClockMinuteRule s_romanian_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_FIVE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TEN,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) |
+        RO_WORD(UN) | RO_WORD(SFERT), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA), { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_TWENTY,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) | RO_WORD(CINCI),
+    { 0, 0, 0 } },
+  { 0, CLOCK_MINUTE_QUANTITY_NONE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) | RO_WORD(JUMATATE),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) |
+        RO_WORD(FARA) | RO_WORD(CINCI),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TWENTY,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) | RO_WORD(FARA),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_NONE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) |
+        RO_WORD(FARA) | RO_WORD(UN) | RO_WORD(SFERT), { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_TEN,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) | RO_WORD(FARA),
+    { 0, 0, 0 } },
+  { 1, CLOCK_MINUTE_QUANTITY_FIVE,
+    RO_WORD(ESTE) | RO_WORD(SI) | RO_WORD(ORA) | RO_WORD(FARA),
+    { 0, 0, 0 } },
+};
+
+static const ClockHourOverride s_romanian_hour_overrides[] = {
+  { 0, 0, CLOCK_HOUR_FORM_SPECIAL,
+    RO_WORD(DOUA) | RO_WORD(SPREZECE) },
+  { 12, 0, CLOCK_HOUR_FORM_SPECIAL,
+    RO_WORD(DOUA) | RO_WORD(SPREZECE) },
+};
+#undef RO_WORD
+
 #define DE_WORD(word) CLOCK_WORD_SET_BIT(DE_WORD_##word)
 static const ClockMinuteRule s_german_minute_rules[CLOCK_MINUTE_RULE_COUNT] = {
   { 0, CLOCK_MINUTE_QUANTITY_NONE,
@@ -1304,6 +1417,13 @@ static const ClockLanguageProfile s_profiles[CLOCK_LANGUAGE_COUNT] = {
     CLOCK_HOUR_FORM_ONE, CLOCK_HOUR_FORM_OTHER, s_czech_hour_overrides,
     sizeof(s_czech_hour_overrides) / sizeof(s_czech_hour_overrides[0]),
   },
+  {
+    s_romanian_grid, { s_romanian_numbers, s_romanian_numbers },
+    s_romanian_minute_quantities,
+    s_romanian_words, RO_WORD_COUNT, 0, s_romanian_minute_rules,
+    CLOCK_HOUR_FORM_ONE, CLOCK_HOUR_FORM_OTHER, s_romanian_hour_overrides,
+    sizeof(s_romanian_hour_overrides) / sizeof(s_romanian_hour_overrides[0]),
+  },
 };
 
 ClockLanguage clock_language_from_string(const char *value) {
@@ -1345,6 +1465,9 @@ ClockLanguage clock_language_from_string(const char *value) {
   }
   if (value && strcmp(value, "cz") == 0) {
     return CLOCK_LANGUAGE_CZ;
+  }
+  if (value && strcmp(value, "ro") == 0) {
+    return CLOCK_LANGUAGE_RO;
   }
   return CLOCK_LANGUAGE_EN;
 }
